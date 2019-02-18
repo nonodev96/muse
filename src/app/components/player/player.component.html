@@ -1,0 +1,49 @@
+<div class="player">
+
+  <div class="info" *ngIf="data_song">
+
+    <div class="picture">
+      <div *ngIf="data_song.audioMetadata.common">
+        <div *ngIf="data_song.audioMetadata.common.picture">
+          <div *ngFor="let picture of data_song.audioMetadata.common.picture">
+            <img class="img-thumbnail" src="data:{{ picture.format }};base64,{{picture.data.toString('base64')}}" alt="{{ picture.description }}">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="title-artist-album">
+      <div class="title">
+        <h4>{{ data_song.title }}</h4>
+      </div>
+      <div class="artist-album">
+        <p *ngIf="data_song.audioMetadata.common">
+          <span class="artist">{{ data_song.audioMetadata.common.artist }}</span>
+          <span class="album">{{ data_song.audioMetadata.common.album }}</span>
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="controllers">
+    <div class="buttons">
+      <button mat-button (click)="pStepBackward()"><i class="fa fa-step-backward"></i></button>
+      <button mat-button (click)="pTogglePlayStop()">
+        <i *ngIf="isPlaying" class="fa fa-stop"></i>
+        <i *ngIf="!isPlaying" class="fa fa-play"></i>
+      </button>
+      <button mat-button (click)="pStepForward()"><i class="fa fa-step-forward"></i></button>
+    </div>
+
+    <div class="progress-bar">
+      <div class="elapsed-time">{{ getFormatTimeLikeSpotify(elapsedTime) }}</div>
+      <mat-slider class="mat-slider-player" step="0.01" min="0" max="{{ durationTime }}" [(value)]="currentTime" (change)="onInputChangeTimeSong($event)"></mat-slider>
+      <div class="duration-time">{{ getFormatTimeLikeSpotify(durationTime) }}</div>
+    </div>
+  </div>
+
+  <div class="volume">
+    <mat-slider class="mat-slider-volume" step="0.01" min="0" max="1" [(value)]="volume" (input)="onInputChangeVolume($event)"></mat-slider>
+  </div>
+</div>
