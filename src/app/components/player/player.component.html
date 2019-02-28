@@ -28,12 +28,12 @@
 
   <div class="controllers">
     <div class="buttons">
-      <button mat-button (click)="pStepBackward()"><i class="fa fa-step-backward"></i></button>
+      <button mat-button (click)="pStepBackward()"><mat-icon>skip_previous</mat-icon></button>
       <button mat-button (click)="pTogglePlayStop()">
-        <i *ngIf="isPlaying" class="fa fa-stop"></i>
-        <i *ngIf="!isPlaying" class="fa fa-play"></i>
+          <mat-icon *ngIf="isPlaying">play_arrow</mat-icon>
+          <mat-icon *ngIf="!isPlaying">stop</mat-icon>
       </button>
-      <button mat-button (click)="pStepForward()"><i class="fa fa-step-forward"></i></button>
+      <button mat-button (click)="pStepForward()"><mat-icon>skip_next</mat-icon></button>
     </div>
 
     <div class="progress-bar">

@@ -52,7 +52,6 @@ export class PlayerComponent implements OnInit, OnDestroy {
     this.dataCurrentTimeSubscription = this._playerService.getCurrentTimeObservable().subscribe(data => this.currentTime = data);
     this.dataTotalTimeSubscription = this._playerService.getDurationTimeObservable().subscribe(data => this.durationTime = data);
     this.dataElapsedTimeSubscription = this._playerService.getElapsedTimeObservable().subscribe(data => this.elapsedTime = data);
-    console.log('AppComponent ngOnInit');
   }
 
   ngOnDestroy(): void {
@@ -60,19 +59,18 @@ export class PlayerComponent implements OnInit, OnDestroy {
     this.dataCurrentTimeSubscription.unsubscribe();
     this.dataTotalTimeSubscription.unsubscribe();
     this.dataElapsedTimeSubscription.unsubscribe();
-    console.log('AppComponent ngOnDestroy');
   }
 
-  private pStepBackward() {
+  public pStepBackward() {
     console.log('pStepBackward');
   }
 
-  private pTogglePlayStop() {
+  public pTogglePlayStop() {
     console.log('pTogglePlayStop');
     this.isPlaying = !this._playerService.playerTogglePlayPause();
   }
 
-  private pStepForward() {
+  public pStepForward() {
     console.log('pStepForward');
   }
 
@@ -84,15 +82,15 @@ export class PlayerComponent implements OnInit, OnDestroy {
     this._playerService.setVolume(value);
   }
 
-  private onInputChangeTimeSong($event: MatSliderChange) {
+  public onInputChangeTimeSong($event: MatSliderChange) {
     this.setCurrentTime($event.value);
   }
 
-  private onInputChangeVolume($event: MatSliderChange) {
+  public onInputChangeVolume($event: MatSliderChange) {
     this.setVolume($event.value);
   }
 
-  private getFormatTimeLikeSpotify(time: number) {
+  public getFormatTimeLikeSpotify(time: number) {
     if (typeof time === 'undefined' || isNaN(time)) {
       time = 0;
     }

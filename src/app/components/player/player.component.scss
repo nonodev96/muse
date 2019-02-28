@@ -1,0 +1,89 @@
+
+.player {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  min-width: 620px;
+  height: 90px;
+  border-top: 1px solid #000;
+  display: grid;
+  grid-gap: 10px;
+  grid-template-columns: 250px 1fr 250px;
+  color: whitesmoke;
+  background: #171717;
+
+  .info {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 100px 150px;
+    align-items: center;
+
+    .picture {
+      grid-column-start: 1;
+
+      img.img-thumbnail {
+        height: 100%;
+        width: 100%
+      }
+    }
+
+    .title-artist-album {
+      display: grid;
+      grid-column-start: 2;
+      grid-template-rows: 45px 45px;
+
+      .title {
+        grid-row-start: 1;
+
+        h4 {
+          margin: 0;
+        }
+      }
+
+      .artist-album {
+        grid-row-start: 2;
+
+        p {
+          margin: 0;
+        }
+      }
+    }
+
+  }
+
+  .controllers {
+    display: grid;
+    grid-auto-rows: auto auto;
+    align-items: center;
+
+    .buttons {
+      display: grid;
+      grid-template-columns: 100px 100px 100px;
+      justify-content: center;
+    }
+
+    .progress-bar {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+
+      .elapsed-time {
+      }
+
+      .mat-slider-player {
+      }
+
+      .duration-time {
+      }
+    }
+  }
+
+  .volume {
+    display: grid;
+    align-items: end;
+    grid-template-columns: auto;
+    justify-content: center;
+  }
+}

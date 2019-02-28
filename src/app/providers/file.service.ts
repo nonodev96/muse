@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {IAudioMetadata} from 'music-metadata';
 import {ElectronService} from './electron.service';
 import * as mm from 'music-metadata/lib/core';
+import * as fs from 'fs';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,7 @@ import * as mm from 'music-metadata/lib/core';
 export class FileService {
   public isElectronApp: boolean;
 
-  private fs;
+  private fs: typeof fs;
   private dialog: Electron.Dialog;
   readonly window: Electron.BrowserWindow;
   private optionsFile: Electron.OpenDialogOptions = {
@@ -34,6 +35,12 @@ export class FileService {
       console.log('isElectronApp' + this.isElectronApp);
     }
   }
+
+
+  public loadFileBuffer(path): Buffer {
+    return this._electronService.fs.readFileSync(path);
+  }
+
 
   public loadFileContent(): Promise<string | IAudioMetadata> {
     return new Promise((resolve) => {

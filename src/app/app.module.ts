@@ -15,7 +15,7 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { ElectronService } from './providers/electron.service';
 
 import { WebviewDirective } from './directives/webview.directive';
-import { MatSliderModule } from '@angular/material/slider';
+import { MatButtonModule, MatSliderModule, MatIconModule } from '@angular/material';
 
 import { AppComponent } from './app.component';
 import { HomeComponent } from './components/home/home.component';
@@ -26,6 +26,8 @@ import { FavoritesComponent } from './components/favorites/favorites.component';
 import { SettingsComponent } from './components/settings/settings.component';
 import { SongComponent } from './components/song/song.component';
 import { AlbumComponent } from './components/album/album.component';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { DebugComponent } from './components/debug/debug.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -43,10 +45,14 @@ export function HttpLoaderFactory(http: HttpClient) {
     FavoritesComponent,
     SettingsComponent,
     SongComponent,
-    AlbumComponent
+    AlbumComponent,
+    DashboardComponent,
+    DebugComponent
   ],
   imports: [
+    MatButtonModule,
     MatSliderModule,
+    MatIconModule,
     BrowserModule,
     FormsModule,
     HttpClientModule,

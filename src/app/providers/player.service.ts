@@ -4,6 +4,7 @@ import {Song} from '../mock/Song';
 import {SONGS} from '../mock/mock-examples';
 import {FileService} from './file.service';
 import {IAudioMetadata} from 'music-metadata/lib/type';
+import { ElectronService } from './electron.service';
 
 
 @Injectable({
@@ -19,7 +20,7 @@ export class PlayerService {
   private durationTimeObservable = new Subject<number>();
   private elapsedTimeObservable = new Subject<number>();
 
-  constructor(private _fileService: FileService) {
+  constructor(private _fileService: FileService, private _electronService: ElectronService) {
     this.audio = new Audio();
     this.setPlayer(SONGS[0]);
     this.attachListeners();
@@ -47,14 +48,14 @@ export class PlayerService {
 
   public setPlayer(song: Song) {
     this.song = song;
-    this.audio.src = song.src;
+    this.audio.srcObject = this._fileService.loadFileBuffer(song.src);
+
     this.audio.load();
     this.getMusicMetaData();
     this.songObservable.next(song);
     this.currentTimeObservable.next(0);
     this.durationTimeObservable.next(0);
     this.elapsedTimeObservable.next(0);
-
   }
 
   public setVolume(volume: number) {
@@ -95,5 +96,15 @@ export class PlayerService {
       this.song.audioMetadata = value;
       this.songObservable.next(this.song);
     });
+  }
+
+  public getData() {
+    let data: any;
+    data = {
+      'audio': this.audio,
+      'song': this.song
+    };
+
+    return data;
   }
 }
