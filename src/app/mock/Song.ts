@@ -1,4 +1,4 @@
-import {IAudioMetadata} from 'music-metadata-browser';
+import { IAudioMetadata } from 'music-metadata-browser';
 
 interface InterfaceSong {
   id: number | string;
@@ -19,18 +19,6 @@ export class Song implements InterfaceSong {
   imgData?: string;
   audioMetadata?: IAudioMetadata | null;
 
-  // @ts-ignore
-  constructor() {
-    this.id  = '';
-    this.title = '';
-    this.album = '';
-    this.artist = '';
-    this.src = '';
-    this.imgData = '';
-    this.audioMetadata = <IAudioMetadata>{};
-  }
-
-  // @ts-ignore
   constructor(song?: any) {
     this.id = song && song.id || '';
     this.title = song && song.title || '';

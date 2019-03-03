@@ -1,10 +1,11 @@
-import {Injectable} from '@angular/core';
-import {Observable, Subject} from 'rxjs';
-import {Song} from '../mock/Song';
-import {SONGS} from '../mock/mock-examples';
-import {FileService} from './file.service';
-import {IAudioMetadata} from 'music-metadata/lib/type';
+import { Injectable } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
+import { Song } from '../mock/Song';
+import { SONGS } from '../mock/mock-examples';
+import { FileService } from './file.service';
+import { IAudioMetadata } from 'music-metadata/lib/type';
 import { ElectronService } from './electron.service';
+import { forEach } from '@angular/router/src/utils/collection';
 
 
 @Injectable({
@@ -13,6 +14,7 @@ import { ElectronService } from './electron.service';
 export class PlayerService {
   private audio: HTMLAudioElement;
   private song: Song;
+  public songList: { files: any, path: any } = { files: {}, path: {} };
   // private tonePlayer: Tone.Player;
 
   private songObservable = new Subject<Song>();
@@ -22,8 +24,7 @@ export class PlayerService {
 
   constructor(private _fileService: FileService, private _electronService: ElectronService) {
     this.audio = new Audio();
-    this.setPlayer(SONGS[0]);
-    this.attachListeners();
+    this.ipcRendererSelectedFiles();
   }
 
   public getSongObservable(): Observable<Song> {
@@ -47,11 +48,12 @@ export class PlayerService {
   }
 
   public setPlayer(song: Song) {
+    console.log(song);
     this.song = song;
-    this.audio.srcObject = this._fileService.loadFileBuffer(song.src);
-
+    this.audio.src = song.src;
     this.audio.load();
     this.getMusicMetaData();
+
     this.songObservable.next(song);
     this.currentTimeObservable.next(0);
     this.durationTimeObservable.next(0);
@@ -94,6 +96,7 @@ export class PlayerService {
   private getMusicMetaData() {
     this._fileService.loadAudioMetaData(this.song.src).then((value: IAudioMetadata) => {
       this.song.audioMetadata = value;
+      console.log(value);
       this.songObservable.next(this.song);
     });
   }
@@ -106,5 +109,28 @@ export class PlayerService {
     };
 
     return data;
+  }
+
+  private startPlayer(args) {
+    this.songList = { ...args };
+    console.log(this.songList);
+    if (this.songList.files.length > 0) {
+      let songInit = new Song({
+        id: 1,
+        title: args.path + '/' + this.songList.files[ 0 ],
+        album: '',
+        artist: '',
+        src: args.path + '/' + this.songList.files[ 0 ]
+      });
+      this.setPlayer(songInit);
+    }
+  }
+
+  private ipcRendererSelectedFiles() {
+    this._electronService.ipcRenderer.on('selected-files', (event, args) => {
+      if (args.files.length > 0 && args.path.length > 0) {
+        this.startPlayer(args);
+      }
+    });
   }
 }

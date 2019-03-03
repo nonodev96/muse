@@ -1,6 +1,8 @@
-import { app, BrowserWindow, screen } from 'electron';
+import { app, dialog, BrowserWindow, screen, Menu } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
+
+const fs = require('fs');
 
 let win, serve;
 const args = process.argv.slice(1);
@@ -18,6 +20,63 @@ function createWindow() {
     width: size.width,
     height: size.height
   });
+
+  let menu = Menu.buildFromTemplate([
+    {
+      label: 'Folders',
+      accelerator: 'CommandOrControl+o',
+      click: function () {
+        openFolderDialog();
+      }
+    },
+    {
+      label: 'Info',
+      click: function () {
+
+      }
+    }
+  ]);
+  Menu.setApplicationMenu(menu);
+
+  function openFolderDialog() {
+    dialog.showOpenDialog(win, {
+      properties: [ 'openDirectory' ]
+    }, function (filePath) {
+
+      if (filePath) {
+        scanDir(filePath);
+      }
+    });
+  }
+
+  function scanDir(filePath) {
+    if (!filePath || filePath[ 0 ] === 'undefined') {
+      return;
+    }
+
+    fs.readdir(filePath[ 0 ], function (err, files) {
+      let arr = [];
+      for (let i = 0; i < files.length; i++) {
+        if (files[ i ].substr(-4) === '.mp3' || files[ i ].substr(-4) === '.m4a'
+          || files[ i ].substr(-5) === '.webm' || files[ i ].substr(-4) === '.wav'
+          || files[ i ].substr(-4) === '.aac' || files[ i ].substr(-4) === '.ogg'
+          || files[ i ].substr(-5) === '.opus') {
+          arr.push(files[ i ]);
+        }
+      }
+      // console.log(filePath);
+      let objToSend = {
+        files: {},
+        path: {}
+      };
+      objToSend.files = arr;
+      objToSend.path = filePath;
+
+      win.webContents.send('selected-files', objToSend);
+      // console.log(win.webContents);
+
+    });
+  }
 
   if (serve) {
     require('electron-reload')(__dirname, {

@@ -6,7 +6,14 @@ export const SONGS: Song[] = [
     title: 'JEKK',
     album: 'album :/',
     artist: '',
-    src: 'file://home/nono/Uni/3. Tercero/MULTIMEDIA/muse/src/assets/Jekk - 01 - Day Free.mp3'
+    src: 'C:\\Users\\NonoDev96\\WebstormProjects\\muse\\src\\assets\\Jekk - 01 - Day Free.mp3'
+  },
+  {
+    id: 12,
+    title: 'JEKK',
+    album: 'album :/',
+    artist: '',
+    src: './src/assets/Jekk - 01 - Day Free.mp3'
   },
   {
     id: 12,
