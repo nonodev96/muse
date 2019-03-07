@@ -6,7 +6,8 @@
       <div *ngIf="data_song.audioMetadata.common">
         <div *ngIf="data_song.audioMetadata.common.picture">
           <div *ngFor="let picture of data_song.audioMetadata.common.picture">
-            <img class="img-thumbnail" src="data:{{ picture.format }};base64,{{picture.data.toString('base64')}}" alt="{{ picture.description }}">
+            <img class="img-thumbnail" src="data:{{ picture.format }};base64,{{picture.data.toString('base64')}}"
+                 alt="{{ picture.description }}">
           </div>
         </div>
       </div>
@@ -14,12 +15,18 @@
 
     <div class="title-artist-album">
       <div class="title">
-        <h4>{{ data_song.title }}</h4>
+        <div *ngIf="data_song.title">
+          <h4>Title: {{ data_song.title }}</h4>
+        </div>
       </div>
-      <div class="artist-album">
+      <div class="artist">
         <p *ngIf="data_song.audioMetadata.common">
-          <span class="artist">{{ data_song.audioMetadata.common.artist }}</span>
-          <span class="album">{{ data_song.audioMetadata.common.album }}</span>
+          Artist: <span class="artist">{{ data_song.audioMetadata.common.artist }}</span>
+        </p>
+      </div>
+      <div class="album">
+        <p *ngIf="data_song.audioMetadata.common">
+          Album: <span class="album">{{ data_song.audioMetadata.common.album }}</span>
         </p>
       </div>
     </div>
@@ -28,22 +35,28 @@
 
   <div class="controllers">
     <div class="buttons">
-      <button mat-button (click)="pStepBackward()"><mat-icon>skip_previous</mat-icon></button>
-      <button mat-button (click)="pTogglePlayStop()">
-          <mat-icon *ngIf="isPlaying">play_arrow</mat-icon>
-          <mat-icon *ngIf="!isPlaying">stop</mat-icon>
+      <button mat-button (click)="pStepBackward()">
+        <mat-icon>skip_previous</mat-icon>
       </button>
-      <button mat-button (click)="pStepForward()"><mat-icon>skip_next</mat-icon></button>
+      <button mat-button (click)="pTogglePlayStop()">
+        <mat-icon *ngIf="isPlaying">play_arrow</mat-icon>
+        <mat-icon *ngIf="!isPlaying">stop</mat-icon>
+      </button>
+      <button mat-button (click)="pStepForward()">
+        <mat-icon>skip_next</mat-icon>
+      </button>
     </div>
 
     <div class="progress-bar">
       <div class="elapsed-time">{{ getFormatTimeLikeSpotify(elapsedTime) }}</div>
-      <mat-slider class="mat-slider-player" step="0.01" min="0" max="{{ durationTime }}" [(value)]="currentTime" (change)="onInputChangeTimeSong($event)"></mat-slider>
+      <mat-slider class="mat-slider-player" step="0.01" min="0" max="{{ durationTime }}" [(value)]="currentTime"
+                  (change)="onInputChangeTimeSong($event)"></mat-slider>
       <div class="duration-time">{{ getFormatTimeLikeSpotify(durationTime) }}</div>
     </div>
   </div>
 
   <div class="volume">
-    <mat-slider class="mat-slider-volume" step="0.01" min="0" max="1" [(value)]="volume" (input)="onInputChangeVolume($event)"></mat-slider>
+    <mat-slider class="mat-slider-volume" step="0.01" min="0" max="1" [(value)]="volume"
+                (input)="onInputChangeVolume($event)"></mat-slider>
   </div>
 </div>

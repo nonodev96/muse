@@ -1,0 +1,26 @@
+
+#cassette {
+  -webkit-transform: scaleY(-1);
+  cursor: default;
+  height: auto;
+  margin: 0 auto;
+  transform: scaleY(-1);
+  width: 60%
+}
+
+#cassette .wheel.right {
+  transform-origin: 457.21px 217.385px;
+}
+
+#cassette .wheel.left {
+  transform-origin: 188.564px 217.335px;
+}
+
+#cassette .strawberry {
+  fill: #ea3402
+}
+
+#cassette .cassette_outline {
+  fill: #0a0b09
+}
+

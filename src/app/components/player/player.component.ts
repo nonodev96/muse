@@ -1,8 +1,8 @@
-import { Component, HostBinding, HostListener, OnDestroy, OnInit } from '@angular/core';
-import { MatSliderChange } from '@angular/material';
-import { PlayerService } from '../../providers/player.service';
-import { Subscription } from 'rxjs';
-import { Song } from '../../mock/Song';
+import {Component, HostBinding, HostListener, OnDestroy, OnInit} from '@angular/core';
+import {MatSliderChange} from '@angular/material';
+import {PlayerService} from '../../providers/player.service';
+import {Subscription} from 'rxjs';
+import {Song} from '../../mock/Song';
 
 @Component({
   selector: 'app-player',
@@ -11,9 +11,9 @@ import { Song } from '../../mock/Song';
 })
 export class PlayerComponent implements OnInit, OnDestroy {
   @HostBinding('class') menuClass = 'player';
+  currentTime;
 
   public data_song: Song;
-  public currentTime: number;
   public durationTime: number;
   public elapsedTime: number;
   public isPlaying: boolean;
@@ -48,10 +48,22 @@ export class PlayerComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.dataSongSubscription = this._playerService.getSongObservable().subscribe(song => this.data_song = song);
-    this.dataCurrentTimeSubscription = this._playerService.getCurrentTimeObservable().subscribe(data => this.currentTime = data);
-    this.dataTotalTimeSubscription = this._playerService.getDurationTimeObservable().subscribe(data => this.durationTime = data);
-    this.dataElapsedTimeSubscription = this._playerService.getElapsedTimeObservable().subscribe(data => this.elapsedTime = data);
+    this.dataSongSubscription = this._playerService.getSongObservable()
+      .subscribe((song) => {
+        this.data_song = song;
+      });
+    this.dataCurrentTimeSubscription = this._playerService.getCurrentTimeObservable()
+      .subscribe((currentTimeObservableValue) => {
+        this.currentTime = currentTimeObservableValue;
+      });
+    this.dataTotalTimeSubscription = this._playerService.getDurationTimeObservable()
+      .subscribe((totalTimeObservableValue) => {
+        this.durationTime = totalTimeObservableValue;
+      });
+    this.dataElapsedTimeSubscription = this._playerService.getElapsedTimeObservable()
+      .subscribe((elapsedTimeObservableValue) => {
+        this.elapsedTime = elapsedTimeObservableValue;
+      });
   }
 
   ngOnDestroy(): void {
@@ -71,6 +83,7 @@ export class PlayerComponent implements OnInit, OnDestroy {
   }
 
   public pStepForward() {
+    this._playerService.setNextSong();
     console.log('pStepForward');
   }
 
@@ -82,10 +95,18 @@ export class PlayerComponent implements OnInit, OnDestroy {
     this._playerService.setVolume(value);
   }
 
+  /***
+   * Modificar el tiempo en el reproductor
+   * @param $event
+   */
   public onInputChangeTimeSong($event: MatSliderChange) {
     this.setCurrentTime($event.value);
   }
 
+  /***
+   * Modificar el volumen del reproductor
+   * @param $event
+   */
   public onInputChangeVolume($event: MatSliderChange) {
     this.setVolume($event.value);
   }

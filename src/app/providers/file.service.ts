@@ -8,7 +8,7 @@ import * as fs from 'fs';
   providedIn: 'root'
 })
 export class FileService {
-  public isElectronApp: boolean;
+  public isElectronApp;
 
   private fs: typeof fs;
   private dialog: Electron.Dialog;
@@ -27,7 +27,7 @@ export class FileService {
   constructor(private _electronService: ElectronService) {
     this.isElectronApp = this._electronService.isElectron();
 
-    if (this.isElectronApp) {
+    if (this.isElectronApp === 'renderer') {
       this.fs = this._electronService.remote.require('fs');
       this.dialog = this._electronService.remote.dialog;
       this.window = this._electronService.remote.getCurrentWindow();
@@ -36,7 +36,6 @@ export class FileService {
     }
   }
 
-
   public loadFileBuffer(path): Buffer {
     return this._electronService.fs.readFileSync(path);
   }
@@ -44,8 +43,8 @@ export class FileService {
 
   public loadFileContent(): Promise<string | IAudioMetadata> {
     return new Promise((resolve) => {
-      if (this.isElectronApp !== true) {
-        resolve('ElectronApp false');
+      if (this.isElectronApp !== 'renderer') {
+        resolve('loadFileContent() return ElectronApp ' + this.isElectronApp);
         return null;
       }
       this.dialog.showOpenDialog(this.window, this.optionsFile, (fileNames) => {
@@ -67,8 +66,8 @@ export class FileService {
 
   public loadAudioMetaData(path: string): Promise<string | IAudioMetadata> {
     return new Promise((resolve) => {
-      if (this.isElectronApp !== true) {
-        resolve('ElectronApp false');
+      if (this.isElectronApp !== 'renderer') {
+        resolve('loadAudioMetaData(path: string) return ElectronApp ' + this.isElectronApp);
         return null;
       }
 

@@ -15,7 +15,7 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { ElectronService } from './providers/electron.service';
 
 import { WebviewDirective } from './directives/webview.directive';
-import { MatButtonModule, MatSliderModule, MatIconModule } from '@angular/material';
+import { MatButtonModule, MatSliderModule, MatIconModule, MatListModule, MatToolbarModule, MatExpansionModule } from '@angular/material';
 
 import { AppComponent } from './app.component';
 import { HomeComponent } from './components/home/home.component';
@@ -53,6 +53,9 @@ export function HttpLoaderFactory(http: HttpClient) {
     MatButtonModule,
     MatSliderModule,
     MatIconModule,
+    MatListModule,
+    MatToolbarModule,
+    MatExpansionModule,
     BrowserModule,
     FormsModule,
     HttpClientModule,

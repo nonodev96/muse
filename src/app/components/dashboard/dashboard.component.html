@@ -1,3 +1,31 @@
-<p>
-  dashboard works!
-</p>
+<div *ngIf="songListInFolder.length == 0">
+  <h2>No Hay canciones cargadas</h2>
+</div>
+
+<div *ngIf="songListInFolder.length > 0">
+
+  <mat-accordion>
+
+    <div *ngFor="let song of songListInFolder; let i = index">
+      <mat-expansion-panel (opened)="panelOpenState[i] = true"
+                           (closed)="panelOpenState[i] = false">
+
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            {{song.title}}
+          </mat-panel-title>
+          <mat-panel-description>
+            {{panelOpenState[i] ? 'open' : 'closed'}}
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <p>I'm visible because I am open</p>
+        <button mat-button (click)="showInfo(song)">Click to see song</button>
+
+      </mat-expansion-panel>
+    </div>
+
+  </mat-accordion>
+
+
+</div>
