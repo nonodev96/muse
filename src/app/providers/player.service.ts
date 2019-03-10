@@ -55,6 +55,10 @@ export class PlayerService {
     return this.elapsedTimeObservable.asObservable();
   }
 
+  public getAudio(): HTMLAudioElement {
+    return this.audio;
+  }
+
   public getSongList(): Song[] {
     return this.songList;
   }
@@ -123,11 +127,8 @@ export class PlayerService {
   private attachListeners() {
     this.audio.addEventListener('timeupdate', () => {
       this.currentTimeObservable.next(this.audio.currentTime);
-      this.currentTimeObservable.complete();
       this.durationTimeObservable.next(this.audio.duration);
-      this.durationTimeObservable.complete();
       this.elapsedTimeObservable.next(this.audio.duration - this.audio.currentTime);
-      this.elapsedTimeObservable.complete();
     });
   }
 
