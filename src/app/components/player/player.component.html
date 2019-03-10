@@ -39,8 +39,8 @@
         <mat-icon>skip_previous</mat-icon>
       </button>
       <button mat-button (click)="pTogglePlayStop()">
-        <mat-icon *ngIf="isPlaying">play_arrow</mat-icon>
-        <mat-icon *ngIf="!isPlaying">stop</mat-icon>
+        <mat-icon *ngIf="!isPaused">play_arrow</mat-icon>
+        <mat-icon *ngIf="isPaused">stop</mat-icon>
       </button>
       <button mat-button (click)="pStepForward()">
         <mat-icon>skip_next</mat-icon>

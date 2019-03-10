@@ -77,9 +77,7 @@ export class PlayerService {
       this.audio.pause();
     }
     this.audioObservable.next(this.audio);
-    this.audioObservable.complete();
     this.songObservable.next(this.song);
-    this.songObservable.complete();
 
     return this.audio.paused;
   }

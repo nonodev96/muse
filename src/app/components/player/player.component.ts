@@ -1,37 +1,40 @@
-import {Component, HostBinding, HostListener, OnDestroy, OnInit} from '@angular/core';
-import {MatSliderChange} from '@angular/material';
-import {PlayerService} from '../../providers/player.service';
-import {Subscription} from 'rxjs';
-import {Song} from '../../mock/Song';
-import construct = Reflect.construct;
+import { Component, HostBinding, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { MatSliderChange } from '@angular/material';
+import { PlayerService } from '../../providers/player.service';
+import { Subscription } from 'rxjs';
+import { Song } from '../../mock/Song';
 
 @Component({
   selector: 'app-player',
   templateUrl: './player.component.html',
-  styleUrls: ['./player.component.scss']
+  styleUrls: [ './player.component.scss' ]
 })
 export class PlayerComponent implements OnInit, OnDestroy {
   @HostBinding('class') menuClass = 'player';
 
+  public audio: HTMLAudioElement;
   public song: Song;
+  public volume: number;
   public durationTime: number;
   public elapsedTime: number;
   public currentTime: number;
-  public isPlaying: boolean;
-  public volume: number;
+  public isPaused: boolean;
 
-  private dataSongSubscription: Subscription;
+  private songSubscription: Subscription;
+  private audioSubscription: Subscription;
   private dataCurrentTimeSubscription: Subscription;
   private dataTotalTimeSubscription: Subscription;
   private dataElapsedTimeSubscription: Subscription;
 
   constructor(private _playerService: PlayerService) {
-    this.volume = this._playerService.getVolume();
+    this.audio = this._playerService.getAudio();
     this.song = this._playerService.getSong();
+    this.volume = this._playerService.getVolume();
+    this.isPaused = false;
     console.log('construct');
   }
 
-  @HostListener('window:keyup', ['$event'])
+  @HostListener('window:keyup', [ '$event' ])
   keyboardEvent(event: KeyboardEvent) {
     if (event.code === 'Space') {
       this.pTogglePlayStop();
@@ -49,12 +52,16 @@ export class PlayerComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.dataSongSubscription = this._playerService.getSongObservable()
+    this.audioSubscription = this._playerService.getAudioObservable()
+      .subscribe((audio: HTMLAudioElement) => {
+        console.log('tu audio');
+        this.audio = audio;
+        this.isPaused = !this.audio.paused;
+      });
+    this.songSubscription = this._playerService.getSongObservable()
       .subscribe((song: Song) => {
-        console.log('tus muertos');
+        console.log('tu canción');
         this.song = song;
-        console.log(this.song);
-        console.log(song);
       });
     this.dataCurrentTimeSubscription = this._playerService.getCurrentTimeObservable()
       .subscribe((currentTimeObservableValue: number) => {
@@ -71,7 +78,8 @@ export class PlayerComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.dataSongSubscription.unsubscribe();
+    this.audioSubscription.unsubscribe();
+    this.songSubscription.unsubscribe();
     this.dataCurrentTimeSubscription.unsubscribe();
     this.dataTotalTimeSubscription.unsubscribe();
     this.dataElapsedTimeSubscription.unsubscribe();
@@ -83,7 +91,7 @@ export class PlayerComponent implements OnInit, OnDestroy {
 
   public pTogglePlayStop() {
     console.log('pTogglePlayStop');
-    this.isPlaying = !this._playerService.playerTogglePlayPause();
+    this._playerService.playerTogglePlayPause();
   }
 
   public pStepForward() {

@@ -42,7 +42,7 @@ export class SongComponent implements OnInit {
   }
 
   rotateCassete() {
-    if (this.audio.paused) {
+    if (!this.audio.paused) {
 
       this.rotate_turn += 0.05;
       if (this.rotate_turn >= 1) {
