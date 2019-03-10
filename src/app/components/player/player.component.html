@@ -1,11 +1,11 @@
 <div class="player">
 
-  <div class="info" *ngIf="data_song">
+  <div class="info" *ngIf="song">
 
     <div class="picture">
-      <div *ngIf="data_song.audioMetadata.common">
-        <div *ngIf="data_song.audioMetadata.common.picture">
-          <div *ngFor="let picture of data_song.audioMetadata.common.picture">
+      <div *ngIf="song.audioMetadata.common">
+        <div *ngIf="song.audioMetadata.common.picture">
+          <div *ngFor="let picture of song.audioMetadata.common.picture">
             <img class="img-thumbnail" src="data:{{ picture.format }};base64,{{picture.data.toString('base64')}}"
                  alt="{{ picture.description }}">
           </div>
@@ -15,18 +15,18 @@
 
     <div class="title-artist-album">
       <div class="title">
-        <div *ngIf="data_song.title">
-          <h4>Title: {{ data_song.title }}</h4>
+        <div *ngIf="song.title">
+          <h4>{{ song.title }}</h4>
         </div>
       </div>
       <div class="artist">
-        <p *ngIf="data_song.audioMetadata.common">
-          Artist: <span class="artist">{{ data_song.audioMetadata.common.artist }}</span>
+        <p *ngIf="song.audioMetadata.common">
+          <span class="artist">{{ song.audioMetadata.common.artist }}</span>
         </p>
       </div>
       <div class="album">
-        <p *ngIf="data_song.audioMetadata.common">
-          Album: <span class="album">{{ data_song.audioMetadata.common.album }}</span>
+        <p *ngIf="song.audioMetadata.common">
+          <span class="album">{{ song.audioMetadata.common.album }}</span>
         </p>
       </div>
     </div>

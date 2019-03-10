@@ -1,6 +1,5 @@
-[![Angular Logo](https://www.vectorlogo.zone/logos/angular/angular-icon.svg)](https://angular.io/) [![Electron Logo](https://www.vectorlogo.zone/logos/electronjs/electronjs-icon.svg)](https://electronjs.org/)
-
-
+[![Angular Logo](https://www.vectorlogo.zone/logos/angular/angular-icon.svg)](https://angular.io/) 
+[![Electron Logo](https://www.vectorlogo.zone/logos/electronjs/electronjs-icon.svg)](https://electronjs.org/)
 [![License](http://img.shields.io/badge/Licence-MIT-brightgreen.svg)](LICENSE.md)
 
 
@@ -34,3 +33,12 @@ Con este simple comando en la terminal podemos utilizar la aplicación Angular c
 |`npm run electron:mac`|  On a MAC OS, builds your application and generates a `.app` file of your application that can be run on Mac |
 
 **Your application is optimised. Only /dist folder and node dependencies are included in the executable.**
+
+
+
+REFERENCIAS
+===========
+https://www.brainbell.com/javascript/show-open-dialog.html
+https://github.com/electron/electron/blob/master/docs/api/dialog.md
+
+https://github.com/angular/material2/issues/7754

@@ -1,0 +1,40 @@
+.dashboard {
+  .mat-content {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+
+  .metadata-song {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+
+    .picture {
+      grid-column-start: 1;
+
+      img.img-thumbnail-album {
+        max-width: 350px;
+        height: auto;
+        margin: 0 auto;
+      }
+    }
+
+    .title-artist-album {
+      grid-column-start: 2;
+      grid-template-rows: 4em 1em 1em;
+
+      .title {
+        grid-row-start: 1;
+      }
+
+      .artist {
+        grid-row-start: 2;
+      }
+
+      .album {
+        grid-row-start: 3;
+
+      }
+    }
+  }
+}

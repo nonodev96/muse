@@ -1,10 +1,11 @@
-import {Injectable} from '@angular/core';
-import {Observable, Subject} from 'rxjs';
-import {Song} from '../mock/Song';
-import {FileService} from './file.service';
-import {IAudioMetadata} from 'music-metadata/lib/type';
-import {ElectronService} from './electron.service';
-import {forEach} from '@angular/router/src/utils/collection';
+import { Injectable } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
+import { Song } from '../mock/Song';
+import { FileService } from './file.service';
+import { IAudioMetadata } from 'music-metadata/lib/type';
+import { ElectronService } from './electron.service';
+import { forEach } from '@angular/router/src/utils/collection';
+import { iterator } from 'rxjs/internal-compatibility';
 
 
 @Injectable({
@@ -14,8 +15,7 @@ export class PlayerService {
   private audio: HTMLAudioElement;
   private songList: Song[] = [];
   private song: Song;
-  private iterator: number = 0;
-  private iterator_length: number;
+  private iterator: number = -1;
 
   private audioObservable = new Subject<HTMLAudioElement>();
   private songListObservable = new Subject<Song[]>();
@@ -25,7 +25,9 @@ export class PlayerService {
   private elapsedTimeObservable = new Subject<number>();
 
   constructor(private _fileService: FileService, private _electronService: ElectronService) {
+    this.song = new Song();
     this.audio = new Audio();
+    this.audio.volume = 1;
     this.ipcRendererSelectedFiles();
   }
 
@@ -53,23 +55,61 @@ export class PlayerService {
     return this.elapsedTimeObservable.asObservable();
   }
 
+  public getSongList(): Song[] {
+    return this.songList;
+  }
+
+  public playerTogglePlayPause() {
+    if (this.audio.paused === true) {
+      let playPromise = this.audio.play();
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+
+        }).catch(function (error) {
+
+        });
+      }
+    } else {
+      this.audio.pause();
+    }
+    this.audioObservable.next(this.audio);
+    this.audioObservable.complete();
+    this.songObservable.next(this.song);
+    this.songObservable.complete();
+
+    return this.audio.paused;
+  }
+
+  public setNextSong() {
+    if (this.iterator < this.songList.length) {
+      this.iterator += 1;
+    }
+    this.debug();
+    if (this.iterator >= this.songList.length) {
+      this.iterator = 0;
+    }
+    let song: Song = this.songList[ this.iterator ];
+    this.setSong(song);
+  }
+
+  public getSong(): Song {
+    return this.song;
+  }
+
   public setSong(song: Song) {
     this.song = song;
     this.audio.src = song.src;
     this.audio.load();
+    this.debug();
 
-    this.getMusicMetaData();
+    this.songObservable.next(this.song);
+    this.audioObservable.next(this.audio);
+
     this.attachListeners();
   }
 
-  public setNextSong() {
-    if (this.iterator < this.iterator_length) {
-      this.iterator += 1;
-    } else {
-      this.iterator = 0;
-    }
-    let song: Song = this.songList[this.iterator];
-    this.setSong(song);
+  public getVolume(): number {
+    return this.audio.volume;
   }
 
   public setVolume(volume: number) {
@@ -80,39 +120,14 @@ export class PlayerService {
     this.audio.currentTime = time;
   }
 
-  public playerTogglePlayPause() {
-
-    if (this.audio.paused === true) {
-      this.audio.play();
-    } else {
-      this.audio.pause();
-    }
-    this.audioObservable.next(this.audio);
-    this.songObservable.next(this.song);
-
-    return this.audio.paused;
-  }
-
-
   private attachListeners() {
     this.audio.addEventListener('timeupdate', () => {
-      this.currentTimeObservable.next(
-        this.audio.currentTime
-      );
-      this.durationTimeObservable.next(
-        this.audio.duration
-      );
-      this.elapsedTimeObservable.next(
-        this.audio.duration - this.audio.currentTime
-      );
-    });
-  }
-
-  private getMusicMetaData() {
-    this._fileService.loadAudioMetaData(this.song.src).then((value: IAudioMetadata) => {
-      this.song.audioMetadata = value;
-      console.log(value);
-      this.songObservable.next(this.song);
+      this.currentTimeObservable.next(this.audio.currentTime);
+      this.currentTimeObservable.complete();
+      this.durationTimeObservable.next(this.audio.duration);
+      this.durationTimeObservable.complete();
+      this.elapsedTimeObservable.next(this.audio.duration - this.audio.currentTime);
+      this.elapsedTimeObservable.complete();
     });
   }
 
@@ -128,40 +143,42 @@ export class PlayerService {
     return data;
   }
 
-  private initPlayerFromFolder(args) {
-    console.log({...args});
+  private initPlayerFromMusicFiles(musicFiles) {
+    console.log({ ...musicFiles });
 
-    if (args.files.length > 0) {
-      this.iterator_length = args.files.length;
-      for (let file in args.files) {
-        let title, album, artist, data_song;
-        this._fileService.loadAudioMetaData(args.path + '/' + args.files[file]).then((value: IAudioMetadata) => {
-          console.log(value);
+    let title, album, artist, data_song;
+    for (let pathFile of musicFiles) {
+      this._fileService.loadAudioMetaDataFromPath(pathFile).then(
+        (value: IAudioMetadata) => {
 
           data_song = value;
           title = value.common.title;
           album = value.common.album;
           artist = value.common.artist;
           let addToList = new Song({
-            id: 1,
+            id: pathFile.index,
             title: title,
             album: album,
             artist: artist,
-            src: args.path + '/' + args.files[file],
+            src: pathFile,
             audioMetadata: data_song
           });
           this.songList.push(addToList);
+          this.songListObservable.next(this.songList);
+          this.songListObservable.complete();
         });
-      }
-      this.songListObservable.next(this.songList);
     }
   }
 
   private ipcRendererSelectedFiles() {
     this._electronService.ipcRenderer.on('selected-files', (event, args) => {
-      if (args.files.length > 0 && args.path.length > 0) {
-        this.initPlayerFromFolder(args);
+      if (args.musicFiles.length > 0) {
+        this.initPlayerFromMusicFiles(args.musicFiles);
       }
     });
+  }
+
+  private debug() {
+    console.log(this.getData());
   }
 }

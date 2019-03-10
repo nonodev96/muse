@@ -1,6 +1,6 @@
-import {Injectable} from '@angular/core';
-import {IAudioMetadata} from 'music-metadata';
-import {ElectronService} from './electron.service';
+import { Injectable } from '@angular/core';
+import { IAudioMetadata } from 'music-metadata';
+import { ElectronService } from './electron.service';
 import * as mm from 'music-metadata/lib/core';
 import * as fs from 'fs';
 
@@ -13,14 +13,14 @@ export class FileService {
   private fs: typeof fs;
   private dialog: Electron.Dialog;
   readonly window: Electron.BrowserWindow;
-  private optionsFile: Electron.OpenDialogOptions = {
+  private optionsFileMusic: Electron.OpenDialogOptions = {
     filters: [
       {
         name: 'Music',
-        extensions: ['mp3']
+        extensions: [ 'mp3', 'm4a', 'webm', 'wav', 'aac', 'ogg', 'opus' ]
       }
     ],
-    properties: ['openFile']
+    properties: [ 'openFile', 'multiSelections' ]
   };
 
 
@@ -32,39 +32,36 @@ export class FileService {
       this.dialog = this._electronService.remote.dialog;
       this.window = this._electronService.remote.getCurrentWindow();
     } else {
-      console.log('isElectronApp' + this.isElectronApp);
+      // console.log('isElectronApp' + this.isElectronApp);
     }
   }
 
-  public loadFileBuffer(path): Buffer {
-    return this._electronService.fs.readFileSync(path);
-  }
-
-
-  public loadFileContent(): Promise<string | IAudioMetadata> {
+  public loadFilesFromFolderContent(): Promise<string | IAudioMetadata> {
     return new Promise((resolve) => {
       if (this.isElectronApp !== 'renderer') {
         resolve('loadFileContent() return ElectronApp ' + this.isElectronApp);
         return null;
       }
-      this.dialog.showOpenDialog(this.window, this.optionsFile, (fileNames) => {
+      this.dialog.showOpenDialog(this.window, this.optionsFileMusic, (fileNames) => {
+        // console.log(fileNames);
         if (fileNames === undefined) {
           console.log('fileNames 0');
           resolve('error');
           return null;
         }
 
-        const stream = this.fs.createReadStream(fileNames[0]);
+        const stream = this.fs.createReadStream(fileNames[ 0 ]);
         mm.parseStream(stream).then((metadata: IAudioMetadata) => {
           stream.close();
-          console.log(metadata);
+          // console.log(metadata);
+
           resolve(metadata);
         });
       });
     });
   }
 
-  public loadAudioMetaData(path: string): Promise<string | IAudioMetadata> {
+  public loadAudioMetaDataFromPath(path: string): Promise<string | IAudioMetadata> {
     return new Promise((resolve) => {
       if (this.isElectronApp !== 'renderer') {
         resolve('loadAudioMetaData(path: string) return ElectronApp ' + this.isElectronApp);
@@ -72,12 +69,12 @@ export class FileService {
       }
 
       const stream = this.fs.createReadStream(path);
-      mm.parseStream(stream).then((metadata: IAudioMetadata) => {
-        stream.close();
-        console.log(metadata);
-        resolve(metadata);
-      });
+      mm.parseStream(stream)
+        .then((metadata: IAudioMetadata) => {
+          stream.close();
+
+          resolve(metadata);
+        });
     });
   }
-
 }

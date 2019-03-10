@@ -5,11 +5,12 @@ import { FileService } from '../../providers/file.service';
 @Component({
   selector: 'app-debug',
   templateUrl: './debug.component.html',
-  styleUrls: ['./debug.component.scss']
+  styleUrls: [ './debug.component.scss' ]
 })
 export class DebugComponent implements OnInit, OnDestroy {
 
-  constructor(private _playerService: PlayerService, private _fileService: FileService) { }
+  constructor(private _playerService: PlayerService, private _fileService: FileService) {
+  }
 
   ngOnInit() {
   }
@@ -19,8 +20,10 @@ export class DebugComponent implements OnInit, OnDestroy {
 
   data() {
     console.log(this._playerService.getData());
+  }
 
-    this._fileService.loadFileContent().then((data) => {
+  load() {
+    this._fileService.loadFilesFromFolderContent().then((data) => {
       console.log(data);
     });
   }

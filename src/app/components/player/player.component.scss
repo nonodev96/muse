@@ -3,18 +3,18 @@
   width: 100%;
   min-width: 620px;
   height: 90px;
-  border-top: 1px solid #000;
+  border-bottom: 2px solid mediumvioletred;
   display: grid;
   grid-gap: 10px;
   color: whitesmoke;
   background: #171717;
-  grid-template-columns: 250px 1fr 250px;
+  grid-template-columns: 350px 1fr 150px;
 
   .info {
     grid-column-start: 1;
     display: grid;
     width: 100%;
-    grid-template-columns: 100px 150px;
+    grid-template-columns: 90px 1fr;
     align-items: center;
 
     .picture {

@@ -16,6 +16,7 @@ import { ElectronService } from './providers/electron.service';
 
 import { WebviewDirective } from './directives/webview.directive';
 import { MatButtonModule, MatSliderModule, MatIconModule, MatListModule, MatToolbarModule, MatExpansionModule } from '@angular/material';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppComponent } from './app.component';
 import { HomeComponent } from './components/home/home.component';
@@ -50,6 +51,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     DebugComponent
   ],
   imports: [
+    BrowserAnimationsModule,
     MatButtonModule,
     MatSliderModule,
     MatIconModule,

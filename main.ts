@@ -23,7 +23,7 @@ function createWindow() {
 
   let menu = Menu.buildFromTemplate([
     {
-      label: 'Folders',
+      label: 'Cargar Musica',
       accelerator: 'CommandOrControl+o',
       click: function () {
         openFolderDialog();
@@ -40,11 +40,18 @@ function createWindow() {
 
   function openFolderDialog() {
     dialog.showOpenDialog(win, {
-      properties: [ 'openDirectory' ]
-    }, function (filePath) {
-
-      if (filePath) {
-        scanDir(filePath);
+      filters: [
+        {
+          name: 'Music',
+          extensions: [ 'mp3', 'm4a', 'webm', 'wav', 'aac', 'ogg', 'opus' ]
+        }
+      ],
+      properties: [ 'openFile', 'multiSelections' ]
+    }, function (musicFiles) {
+      console.log(musicFiles);
+      if (musicFiles) {
+        win.webContents.send('selected-files', {musicFiles});
+        //   scanDir(filePath);
       }
     });
   }

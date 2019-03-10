@@ -3,6 +3,7 @@ import {MatSliderChange} from '@angular/material';
 import {PlayerService} from '../../providers/player.service';
 import {Subscription} from 'rxjs';
 import {Song} from '../../mock/Song';
+import construct = Reflect.construct;
 
 @Component({
   selector: 'app-player',
@@ -11,11 +12,11 @@ import {Song} from '../../mock/Song';
 })
 export class PlayerComponent implements OnInit, OnDestroy {
   @HostBinding('class') menuClass = 'player';
-  currentTime;
 
-  public data_song: Song;
+  public song: Song;
   public durationTime: number;
   public elapsedTime: number;
+  public currentTime: number;
   public isPlaying: boolean;
   public volume: number;
 
@@ -25,9 +26,9 @@ export class PlayerComponent implements OnInit, OnDestroy {
   private dataElapsedTimeSubscription: Subscription;
 
   constructor(private _playerService: PlayerService) {
-    this.isPlaying = false;
-    this.volume = 1;
-    this.data_song = new Song();
+    this.volume = this._playerService.getVolume();
+    this.song = this._playerService.getSong();
+    console.log('construct');
   }
 
   @HostListener('window:keyup', ['$event'])
@@ -49,19 +50,22 @@ export class PlayerComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.dataSongSubscription = this._playerService.getSongObservable()
-      .subscribe((song) => {
-        this.data_song = song;
+      .subscribe((song: Song) => {
+        console.log('tus muertos');
+        this.song = song;
+        console.log(this.song);
+        console.log(song);
       });
     this.dataCurrentTimeSubscription = this._playerService.getCurrentTimeObservable()
-      .subscribe((currentTimeObservableValue) => {
+      .subscribe((currentTimeObservableValue: number) => {
         this.currentTime = currentTimeObservableValue;
       });
     this.dataTotalTimeSubscription = this._playerService.getDurationTimeObservable()
-      .subscribe((totalTimeObservableValue) => {
+      .subscribe((totalTimeObservableValue: number) => {
         this.durationTime = totalTimeObservableValue;
       });
     this.dataElapsedTimeSubscription = this._playerService.getElapsedTimeObservable()
-      .subscribe((elapsedTimeObservableValue) => {
+      .subscribe((elapsedTimeObservableValue: number) => {
         this.elapsedTime = elapsedTimeObservableValue;
       });
   }
