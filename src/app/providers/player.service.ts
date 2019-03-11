@@ -1,11 +1,9 @@
-import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
-import { Song } from '../mock/Song';
-import { FileService } from './file.service';
-import { IAudioMetadata } from 'music-metadata/lib/type';
-import { ElectronService } from './electron.service';
-import { forEach } from '@angular/router/src/utils/collection';
-import { iterator } from 'rxjs/internal-compatibility';
+import {Injectable} from '@angular/core';
+import {Observable, Subject} from 'rxjs';
+import {Song} from '../mock/Song';
+import {FileService} from './file.service';
+import {IAudioMetadata} from 'music-metadata/lib/type';
+import {ElectronService} from './electron.service';
 
 
 @Injectable({
@@ -23,6 +21,7 @@ export class PlayerService {
   private currentTimeObservable = new Subject<number>();
   private durationTimeObservable = new Subject<number>();
   private elapsedTimeObservable = new Subject<number>();
+  private musicFiles: string[] = [];
 
   constructor(private _fileService: FileService, private _electronService: ElectronService) {
     this.song = new Song();
@@ -90,7 +89,7 @@ export class PlayerService {
     if (this.iterator >= this.songList.length) {
       this.iterator = 0;
     }
-    let song: Song = this.songList[ this.iterator ];
+    let song: Song = this.songList[this.iterator];
     this.setSong(song);
   }
 
@@ -142,29 +141,24 @@ export class PlayerService {
     return data;
   }
 
-  private initPlayerFromMusicFiles(musicFiles) {
-    console.log({ ...musicFiles });
+  private initPlayerFromMusicFiles(musicFiles: string[]) {
+    let differenceMusicFiles: string[] = <string[]>Array.from(this.setDifference(new Set(musicFiles), new Set(this.musicFiles)));
+    this.musicFiles = <string[]>Array.from(this.setUnion(new Set(this.musicFiles), new Set(musicFiles)));
+    console.log(differenceMusicFiles);
 
-    let title, album, artist, data_song;
-    for (let pathFile of musicFiles) {
+    for (let index in differenceMusicFiles) {
+      let pathFile: string = differenceMusicFiles[index];
       this._fileService.loadAudioMetaDataFromPath(pathFile).then(
-        (value: IAudioMetadata) => {
-
-          data_song = value;
-          title = value.common.title;
-          album = value.common.album;
-          artist = value.common.artist;
-          let addToList = new Song({
-            id: pathFile.index,
-            title: title,
-            album: album,
-            artist: artist,
+        (audioMetadataValue: IAudioMetadata) => {
+          this.songList.push(new Song({
+            id: '1',
+            title: audioMetadataValue.common.title,
+            album: audioMetadataValue.common.album,
+            artist: audioMetadataValue.common.artist,
             src: pathFile,
-            audioMetadata: data_song
-          });
-          this.songList.push(addToList);
+            audioMetadata: audioMetadataValue
+          }));
           this.songListObservable.next(this.songList);
-          this.songListObservable.complete();
         });
     }
   }
@@ -172,9 +166,50 @@ export class PlayerService {
   private ipcRendererSelectedFiles() {
     this._electronService.ipcRenderer.on('selected-files', (event, args) => {
       if (args.musicFiles.length > 0) {
-        this.initPlayerFromMusicFiles(args.musicFiles);
+        let arrayMusicFiles: string[] = [...args.musicFiles];
+        this.initPlayerFromMusicFiles(arrayMusicFiles);
       }
     });
+  }
+
+  private toConsumableArray(arr): any {
+    return this.arrayWithoutHoles(arr) || this.iterableToArray(arr) || this.nonIterableSpread();
+  }
+
+  private nonIterableSpread() {
+    throw new TypeError('Invalid attempt to spread non-iterable instance');
+  }
+
+  private iterableToArray(iter) {
+    if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === '[object Arguments]') {
+      return Array.from(iter);
+    }
+  }
+
+  private arrayWithoutHoles(arr) {
+    if (Array.isArray(arr)) {
+      let arr2 = new Array(arr.length);
+      for (let i = 0; i < arr.length; i++) {
+        arr2[i] = arr[i];
+      }
+      return arr2;
+    }
+  }
+
+  private setDifference(a, b) {
+    return new Set(this.toConsumableArray(a).filter(function (x) {
+      return !b.has(x);
+    }));
+  }
+
+  private setIntersection(a, b) {
+    return new Set(this.toConsumableArray(a).filter(function (x) {
+      return b.has(x);
+    }));
+  }
+
+  private setUnion(a, b) {
+    return new Set([].concat(this.toConsumableArray(a), this.toConsumableArray(b)));
   }
 
   private debug() {

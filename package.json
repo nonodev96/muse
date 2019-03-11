@@ -1,6 +1,6 @@
 {
   "name": "muse-ujaen",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Angular 7 with Electron (Typescript + SASS + Hot Reload)",
   "homepage": "https://github.com/nonodev96/muse",
   "author": {
@@ -41,7 +41,6 @@
     "@angular/animations": "^7.2.5",
     "@angular/cdk": "^7.3.2",
     "@angular/material": "^7.3.2",
-    "electron-json-storage": "^4.1.6",
     "music-metadata": "^3.5.2",
     "music-metadata-browser": "^0.7.1"
   },

@@ -1,3 +1,12 @@
+## 0.0.6 (2019-03-11)
+
+* fix/ eliminado el bug que duplicaba las canciones.
+* Se han añadido funciones de matematica discreta para trabajar con arrays.
+
+## 0.0.5 (2019-03-10)
+
+* fix/ variable isPlaying de component-song eliminada y ahora funciona con el observable.
+
 ## 0.0.4 (2019-03-10)
 
-* fix/ song cassette with observables audio and song for play and paused
+* fix/ song cassette con observables audio.
