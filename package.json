@@ -1,6 +1,6 @@
 {
   "name": "muse-ujaen",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Angular 7 with Electron (Typescript + SASS + Hot Reload)",
   "homepage": "https://github.com/nonodev96/muse",
   "author": {

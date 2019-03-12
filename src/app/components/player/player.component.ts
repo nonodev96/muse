@@ -85,18 +85,27 @@ export class PlayerComponent implements OnInit, OnDestroy {
     this.dataElapsedTimeSubscription.unsubscribe();
   }
 
+  /**
+   * Previous song
+   */
   public pStepBackward() {
-    console.log('pStepBackward');
-  }
-
-  public pTogglePlayStop() {
-    console.log('pTogglePlayStop');
+    this._playerService.setPreviousSong();
     this._playerService.playerTogglePlayPause();
   }
 
+  /**
+   * Play Pause song
+   */
+  public pTogglePlayStop() {
+    this._playerService.playerTogglePlayPause();
+  }
+
+  /**
+   * Next song
+   */
   public pStepForward() {
     this._playerService.setNextSong();
-    console.log('pStepForward');
+    this._playerService.playerTogglePlayPause();
   }
 
   private setCurrentTime(value: number) {

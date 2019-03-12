@@ -1,3 +1,7 @@
+## 0.0.7 (2019-03-12)
+
+* issue/ issue-3 Refactor playerService, icons and more
+
 ## 0.0.6 (2019-03-11)
 
 * fix/ eliminado el bug que duplicaba las canciones.

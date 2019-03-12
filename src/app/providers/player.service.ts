@@ -6,6 +6,13 @@ import {IAudioMetadata} from 'music-metadata/lib/type';
 import {ElectronService} from './electron.service';
 
 
+interface InterfaceDataPlayer {
+  audio: HTMLAudioElement;
+  song: Song;
+  songList: Song[];
+  iterator: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -54,14 +61,6 @@ export class PlayerService {
     return this.elapsedTimeObservable.asObservable();
   }
 
-  public getAudio(): HTMLAudioElement {
-    return this.audio;
-  }
-
-  public getSongList(): Song[] {
-    return this.songList;
-  }
-
   public playerTogglePlayPause() {
     if (this.audio.paused === true) {
       let playPromise = this.audio.play();
@@ -81,24 +80,24 @@ export class PlayerService {
     return this.audio.paused;
   }
 
-  public setNextSong() {
-    if (this.iterator < this.songList.length) {
-      this.iterator += 1;
+  public setPreviousSong() {
+    if (this.iterator === 0) {
+      this.iterator = this.songList.length;
     }
-    this.debug();
-    if (this.iterator >= this.songList.length) {
-      this.iterator = 0;
-    }
+    this.iterator--;
     let song: Song = this.songList[this.iterator];
+    this.setPlayer(song);
+  }
+
+  public setNextSong() {
+    this.iterator++;
+    this.iterator = this.iterator % this.songList.length;
+    let song: Song = this.songList[this.iterator];
+    this.setPlayer(song);
+  }
+
+  public setPlayer(song: Song) {
     this.setSong(song);
-  }
-
-  public getSong(): Song {
-    return this.song;
-  }
-
-  public setSong(song: Song) {
-    this.song = song;
     this.audio.src = song.src;
     this.audio.load();
     this.debug();
@@ -109,12 +108,40 @@ export class PlayerService {
     this.attachListeners();
   }
 
+  public getAudio(): HTMLAudioElement {
+    return this.audio;
+  }
+
+  public setAudio(audio: HTMLAudioElement) {
+    this.audio = audio;
+  }
+
+  public getSongList(): Song[] {
+    return this.songList;
+  }
+
+  public setSongList(songList: Song[]) {
+    this.songList = songList;
+  }
+
+  public getSong(): Song {
+    return this.song;
+  }
+
+  public setSong(song: Song) {
+    this.song = song;
+  }
+
   public getVolume(): number {
     return this.audio.volume;
   }
 
   public setVolume(volume: number) {
     this.audio.volume = volume;
+  }
+
+  public getCurrentTime(): number {
+    return this.audio.currentTime;
   }
 
   public setCurrentTime(time: number) {
@@ -129,16 +156,13 @@ export class PlayerService {
     });
   }
 
-  public getData() {
-    let data: any;
-    data = {
+  public getData(): InterfaceDataPlayer {
+    return {
       'audio': this.audio,
       'song': this.song,
       'songList': this.songList,
       'iterator': this.iterator
     };
-
-    return data;
   }
 
   private initPlayerFromMusicFiles(musicFiles: string[]) {
@@ -163,6 +187,9 @@ export class PlayerService {
     }
   }
 
+  /**
+   * Electron tunel
+   */
   private ipcRendererSelectedFiles() {
     this._electronService.ipcRenderer.on('selected-files', (event, args) => {
       if (args.musicFiles.length > 0) {

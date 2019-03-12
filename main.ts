@@ -18,21 +18,22 @@ function createWindow() {
     x: 0,
     y: 0,
     width: size.width,
-    height: size.height
+    height: size.height,
+    icon: path.join(__dirname, 'src/assets/icons/ujaen_64x64.png')
   });
 
   let menu = Menu.buildFromTemplate([
     {
-      label: 'Cargar Musica',
+      label: 'Cargar Música',
       accelerator: 'CommandOrControl+o',
       click: function () {
         openFolderDialog();
       }
     },
     {
-      label: 'Info',
+      label: 'Dev Tools',
       click: function () {
-
+        win.webContents.openDevTools();
       }
     }
   ]);
