@@ -1,3 +1,7 @@
+## 0.0.8 (2019-03-12)
+
+* issue/ issue-4 Persistencia de datos
+
 ## 0.0.7 (2019-03-12)
 
 * issue/ issue-3 Refactor playerService, icons and more
