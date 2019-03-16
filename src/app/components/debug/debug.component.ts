@@ -1,7 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { PlayerService } from '../../providers/player.service';
 import { FileService } from '../../providers/file.service';
-import mysql from 'mysql';
+import { ElectronService } from '../../providers/electron.service';
+import { DatabaseService, InterfaceFavorites, InterfaceFavoriteToAdd, InterfaceFavoriteToDelete } from '../../providers/database.service';
+import { MatSnackBar } from '@angular/material';
 
 @Component({
   selector: 'app-debug',
@@ -10,7 +12,14 @@ import mysql from 'mysql';
 })
 export class DebugComponent implements OnInit, OnDestroy {
 
-  constructor(private _playerService: PlayerService, private _fileService: FileService) {
+  i: number;
+
+  constructor(private _databaseService: DatabaseService,
+              private _electronService: ElectronService,
+              private _playerService: PlayerService,
+              private _fileService: FileService,
+              private snackBar: MatSnackBar) {
+    this.i = 0;
   }
 
   ngOnInit() {
@@ -29,19 +38,59 @@ export class DebugComponent implements OnInit, OnDestroy {
     });
   }
 
-  database(){
-    let connection = mysql.createConnection({
-      host: 'localhost',
-      user: 'root',
-      password: 'museujaen',
-      database: 'museujaen'
-    });
-    connection.connect();
-    connection.query('SELECT 1 + 1 AS result', function (error, results, fields) {
-      if (error) throw error;
-      console.log('1 + 1 = ', results[0].result);
-    });
-    connection.end();
+  database() {
+    this._databaseService.database();
+  }
 
+  addFavorite() {
+    let songPathToAdd: InterfaceFavoriteToAdd = {
+      path: 'favorite ' + this.i
+    };
+    this._databaseService.addFavorite(songPathToAdd);
+    this.i++;
+    if (this.i >= 10) {
+      this.i = 0;
+    }
+  }
+
+  /**
+   * multiple add not is atomic
+   */
+  addAllFavorites() {
+    for (let i = 0; i < 10; i++) {
+      let songPathToAdd: InterfaceFavoriteToAdd = {
+        path: 'favorite ' + i
+      };
+      this._databaseService.addFavorite(songPathToAdd);
+    }
+  }
+
+  deleteFavorite() {
+    let songPathToDelete: InterfaceFavoriteToDelete = {
+      path: 'favorite 5'
+    };
+    this._databaseService.deleteFavorite(songPathToDelete);
+  }
+
+  /**
+   * multiple delete not is atomic
+   */
+  deleteAllFavorites() {
+    for (let i = 0; i < 10; i++) {
+      let songPathToDelete: InterfaceFavoriteToDelete = {
+        path: 'favorite ' + i
+      };
+      this._databaseService.deleteFavorite(songPathToDelete);
+    }
+  }
+
+  getAllFavorites() {
+    this._databaseService.getAllFavorites();
+  }
+
+  openSnackBar() {
+    this.snackBar.open('Message archived', 'Undo', {
+      duration: 3000
+    });
   }
 }

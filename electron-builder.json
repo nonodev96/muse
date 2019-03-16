@@ -1,6 +1,6 @@
 {
   "productName": "muse-ujaen-angular-electron",
-  "appId": "com.hypermodules.testapp",
+  "appId": "com.muse.app",
   "directories": {
     "output": "release/"
   },

@@ -2,7 +2,10 @@ import {app, dialog, BrowserWindow, screen, Menu} from 'electron';
 import * as path from 'path';
 import * as url from 'url';
 const fs = require('fs');
+const storage = require('electron-json-storage');
 
+const dataPath = storage.getDataPath();
+console.log(dataPath);
 
 const args = process.argv.slice(1);
 let win;
