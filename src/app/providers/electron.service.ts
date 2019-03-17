@@ -6,6 +6,7 @@ import { ipcRenderer, webFrame, remote } from 'electron';
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
 
+
 @Injectable()
 export class ElectronService {
 
@@ -27,8 +28,7 @@ export class ElectronService {
     }
   }
 
-  isElectron = () => {
+  isElectron() {
     return window && window.process && window.process.type;
   }
-
 }

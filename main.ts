@@ -4,9 +4,10 @@ import * as url from 'url';
 
 const fs = require('fs');
 
-let win, serve;
 const args = process.argv.slice(1);
-serve = args.some(val => val === '--serve');
+let win;
+let serve = args.some(val => val === '--serve');
+
 
 function createWindow() {
 
@@ -19,7 +20,7 @@ function createWindow() {
     y: 0,
     width: size.width,
     height: size.height,
-    icon: path.join(__dirname, 'src/assets/icons/ujaen_64x64.png')
+    icon: path.join(__dirname, 'src/assets/icons/512x512.png')
   });
 
   let menu = Menu.buildFromTemplate([
@@ -51,7 +52,7 @@ function createWindow() {
     }, function (musicFiles) {
       console.log(musicFiles);
       if (musicFiles) {
-        win.webContents.send('selected-files', {musicFiles});
+        win.webContents.send('selected-files', { musicFiles });
         //   scanDir(filePath);
       }
     });
