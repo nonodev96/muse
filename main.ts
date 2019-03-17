@@ -1,11 +1,8 @@
-import {app, dialog, BrowserWindow, screen, Menu} from 'electron';
+import { app, dialog, BrowserWindow, screen, Menu } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
-const fs = require('fs');
-const storage = require('electron-json-storage');
 
-const dataPath = storage.getDataPath();
-console.log(dataPath);
+const fs = require('fs');
 
 const args = process.argv.slice(1);
 let win;
@@ -48,32 +45,32 @@ function createWindow() {
       filters: [
         {
           name: 'Music',
-          extensions: ['mp3', 'm4a', 'webm', 'wav', 'aac', 'ogg', 'opus']
+          extensions: [ 'mp3', 'm4a', 'webm', 'wav', 'aac', 'ogg', 'opus' ]
         }
       ],
-      properties: ['openFile', 'multiSelections']
+      properties: [ 'openFile', 'multiSelections' ]
     }, function (musicFiles) {
       console.log(musicFiles);
       if (musicFiles) {
-        win.webContents.send('selected-files', {musicFiles});
+        win.webContents.send('selected-files', { musicFiles });
         //   scanDir(filePath);
       }
     });
   }
 
   function scanDir(filePath) {
-    if (!filePath || filePath[0] === 'undefined') {
+    if (!filePath || filePath[ 0 ] === 'undefined') {
       return;
     }
 
-    fs.readdir(filePath[0], function (err, files) {
+    fs.readdir(filePath[ 0 ], function (err, files) {
       let arr = [];
       for (let i = 0; i < files.length; i++) {
-        if (files[i].substr(-4) === '.mp3' || files[i].substr(-4) === '.m4a'
-          || files[i].substr(-5) === '.webm' || files[i].substr(-4) === '.wav'
-          || files[i].substr(-4) === '.aac' || files[i].substr(-4) === '.ogg'
-          || files[i].substr(-5) === '.opus') {
-          arr.push(files[i]);
+        if (files[ i ].substr(-4) === '.mp3' || files[ i ].substr(-4) === '.m4a'
+          || files[ i ].substr(-5) === '.webm' || files[ i ].substr(-4) === '.wav'
+          || files[ i ].substr(-4) === '.aac' || files[ i ].substr(-4) === '.ogg'
+          || files[ i ].substr(-5) === '.opus') {
+          arr.push(files[ i ]);
         }
       }
       // console.log(filePath);

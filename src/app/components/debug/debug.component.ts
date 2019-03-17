@@ -38,58 +38,77 @@ export class DebugComponent implements OnInit, OnDestroy {
     });
   }
 
-  database() {
-    this._databaseService.database();
-  }
-
   addFavorite() {
     let songPathToAdd: InterfaceFavoriteToAdd = {
       path: 'favorite ' + this.i
     };
-    this._databaseService.addFavorite(songPathToAdd);
+    this._databaseService.addFavorite(songPathToAdd).then(value => {
+      if (value === true) {
+        this.openSnackBar('La cancion se ha añadido a favoritos');
+      } else if (value === false) {
+        this.openSnackBar('La cancion no se ha podido añadir a favoritos por un error');
+      } else {
+        this.openSnackBar(value);
+      }
+    });
     this.i++;
     if (this.i >= 10) {
       this.i = 0;
     }
   }
 
-  /**
-   * multiple add not is atomic
-   */
-  addAllFavorites() {
-    for (let i = 0; i < 10; i++) {
-      let songPathToAdd: InterfaceFavoriteToAdd = {
-        path: 'favorite ' + i
-      };
-      this._databaseService.addFavorite(songPathToAdd);
-    }
+  createNewPlaylist() {
+    let songPathToAdd: string = 'playlist ' + this.i;
+    this._databaseService.createPlayList(songPathToAdd).then(value => {
+      if (value === true) {
+        this.openSnackBar('La playlist se ha creado correctamente');
+      } else if (value === false) {
+        this.openSnackBar('La playlist no se ha podido crear por un error');
+      } else {
+        this.openSnackBar(value);
+      }
+    });
+    this.i++;
+  }
+
+  deletePlaylist() {
+    let songPathToAdd: string = 'playlist 3';
+    this._databaseService.deletePlayList(songPathToAdd).then(value => {
+      if (value === true) {
+        this.openSnackBar('La playlist se ha borrado correctamente');
+      } else if (value === false) {
+        this.openSnackBar('La playlist no se ha podido borrar por un error');
+      } else {
+        this.openSnackBar(value);
+      }
+    });
   }
 
   deleteFavorite() {
     let songPathToDelete: InterfaceFavoriteToDelete = {
       path: 'favorite 5'
     };
-    this._databaseService.deleteFavorite(songPathToDelete);
-  }
-
-  /**
-   * multiple delete not is atomic
-   */
-  deleteAllFavorites() {
-    for (let i = 0; i < 10; i++) {
-      let songPathToDelete: InterfaceFavoriteToDelete = {
-        path: 'favorite ' + i
-      };
-      this._databaseService.deleteFavorite(songPathToDelete);
-    }
+    this._databaseService.deleteFavorite(songPathToDelete).then(value => {
+      if (value === true) {
+        this.openSnackBar('La cancion se ha borrado de favoritos');
+      } else if (value === false) {
+        this.openSnackBar('La cancion no se ha podido borrar de favoritos por un error');
+      } else {
+        this.openSnackBar(value);
+      }
+    });
   }
 
   getAllFavorites() {
     this._databaseService.getAllFavorites();
   }
 
-  openSnackBar() {
-    this.snackBar.open('Message archived', 'Undo', {
+  database() {
+    this._databaseService.database();
+  }
+
+  private openSnackBar(message: string, action: string = 'Undo') {
+    this.snackBar.open(message, action, {
       duration: 3000
     });
   }
