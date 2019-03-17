@@ -50,4 +50,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.songListInFolder = songList;
     });
   }
+
+  playSong(song: Song) {
+    this._playerService.setPlayer(song);
+    this._playerService.playerTogglePlayPause();
+  }
 }

@@ -112,6 +112,13 @@ export class DebugComponent implements OnInit, OnDestroy {
     });
   }
 
+  getPlayListsByName() {
+    let namePlayList = this.namePlayList;
+    this._databaseService.getPlayListsByName(namePlayList).then(value => {
+      console.log(value);
+    });
+  }
+
   addSongPathToPlayList() {
     let namePlayList = this.namePlayList;
     let nameSongPath = this.nameSongPath;

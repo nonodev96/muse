@@ -1,9 +1,10 @@
-import {Injectable} from '@angular/core';
-import {Observable, Subject} from 'rxjs';
-import {Song} from '../mock/Song';
-import {FileService} from './file.service';
-import {IAudioMetadata} from 'music-metadata/lib/type';
-import {ElectronService} from './electron.service';
+import { Injectable } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
+import { Song } from '../mock/Song';
+import { FileService } from './file.service';
+import { IAudioMetadata } from 'music-metadata/lib/type';
+import { ElectronService } from './electron.service';
+import { DataBase, DatabaseService, InterfacePlayList } from './database.service';
 
 
 interface InterfaceDataPlayer {
@@ -30,7 +31,11 @@ export class PlayerService {
   private elapsedTimeObservable = new Subject<number>();
   private musicFiles: string[] = [];
 
-  constructor(private _fileService: FileService, private _electronService: ElectronService) {
+  constructor(private _fileService: FileService,
+              private _databaseService: DatabaseService,
+              private _electronService: ElectronService
+  ) {
+    console.log('init player service');
     this.song = new Song();
     this.audio = new Audio();
     this.audio.volume = 1;
@@ -85,14 +90,14 @@ export class PlayerService {
       this.iterator = this.songList.length;
     }
     this.iterator--;
-    let song: Song = this.songList[this.iterator];
+    let song: Song = this.songList[ this.iterator ];
     this.setPlayer(song);
   }
 
   public setNextSong() {
     this.iterator++;
     this.iterator = this.iterator % this.songList.length;
-    let song: Song = this.songList[this.iterator];
+    let song: Song = this.songList[ this.iterator ];
     this.setPlayer(song);
   }
 
@@ -169,9 +174,14 @@ export class PlayerService {
     let differenceMusicFiles: string[] = <string[]>Array.from(this.setDifference(new Set(musicFiles), new Set(this.musicFiles)));
     this.musicFiles = <string[]>Array.from(this.setUnion(new Set(this.musicFiles), new Set(musicFiles)));
     console.log(differenceMusicFiles);
+    this._databaseService.addSongsPathToPlayList(DataBase.songsLoad, differenceMusicFiles).then(value => {
+
+      console.log(value);
+
+    });
 
     for (let index in differenceMusicFiles) {
-      let pathFile: string = differenceMusicFiles[index];
+      let pathFile: string = differenceMusicFiles[ index ];
       this._fileService.loadAudioMetaDataFromPath(pathFile).then(
         (audioMetadataValue: IAudioMetadata) => {
           this.songList.push(new Song({
@@ -191,11 +201,22 @@ export class PlayerService {
    * Electron tunel
    */
   private ipcRendererSelectedFiles() {
-    this._electronService.ipcRenderer.on('selected-files', (event, args) => {
-      if (args.musicFiles.length > 0) {
-        let arrayMusicFiles: string[] = [...args.musicFiles];
-        this.initPlayerFromMusicFiles(arrayMusicFiles);
+    this._databaseService.getPlayListsByName(DataBase.songsLoad).then((songsLoad: InterfacePlayList) => {
+      console.log(songsLoad);
+      if (songsLoad.paths.length > 0) {
+        this.initPlayerFromMusicFiles(songsLoad.paths);
+      } else {
+        console.log('no hay canciones cargadas');
       }
+
+      this._electronService.ipcRenderer.on('selected-files', (event, args) => {
+        console.log('es esto un evento?');
+        if (args.musicFiles.length > 0) {
+          let arrayMusicFiles: string[] = [ ...args.musicFiles ];
+          this.initPlayerFromMusicFiles(arrayMusicFiles);
+        }
+      });
+
     });
   }
 
@@ -217,7 +238,7 @@ export class PlayerService {
     if (Array.isArray(arr)) {
       let arr2 = new Array(arr.length);
       for (let i = 0; i < arr.length; i++) {
-        arr2[i] = arr[i];
+        arr2[ i ] = arr[ i ];
       }
       return arr2;
     }

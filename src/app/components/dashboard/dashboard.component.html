@@ -1,83 +1,68 @@
-<button mat-button (click)="debug()">Dashboard Debug</button>
-<button mat-button (click)="loadDashboard()">Load Dashboard</button>
+<div class="container-dashboard">
+  <button mat-button (click)="debug()">Dashboard Debug</button>
+  <button mat-button (click)="loadDashboard()">Load Dashboard</button>
 
-<div *ngIf="!songListInFolder">
-  <h2>No Hay canciones cargadas</h2>
-</div>
+  <div *ngIf="!songListInFolder">
+    <h2>No Hay canciones cargadas</h2>
+  </div>
 
+  <div *ngIf="songListInFolder" class="dashboard">
 
-<div *ngIf="songListInFolder" class="dashboard">
+    <mat-accordion>
 
-  <mat-accordion>
+      <mat-expansion-panel *ngFor="let song of songListInFolder; let i = index"
+                           (opened)="panelOpenState[i] = true"
+                           (closed)="panelOpenState[i] = false">
 
-    <mat-expansion-panel *ngFor="let song of songListInFolder; let i = index"
-                         (opened)="panelOpenState[i] = true"
-                         (closed)="panelOpenState[i] = false">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            {{ song.title }}
+          </mat-panel-title>
+          <mat-panel-description>
+            I'm visible because I am {{ panelOpenState[i] ? 'open' : 'closed' }}
+          </mat-panel-description>
+        </mat-expansion-panel-header>
 
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-          {{ song.title }}
-        </mat-panel-title>
-        <mat-panel-description>
-          I'm visible because I am {{ panelOpenState[i] ? 'open' : 'closed' }}
-        </mat-panel-description>
-      </mat-expansion-panel-header>
-
-      <div class="metadata-song" *ngIf="song">
-        <div class="picture">
-          <div *ngIf="song.audioMetadata.common">
-            <div *ngIf="song.audioMetadata.common.picture">
-              <div *ngFor="let picture of song.audioMetadata.common.picture">
-                <img class="img-thumbnail-album"
-                     src="data:{{ picture.format }};base64,{{picture.data.toString('base64')}}"
-                     alt="{{ picture.description }}">
+        <div class="metadata-song" *ngIf="song">
+          <div class="picture">
+            <div *ngIf="song.audioMetadata.common">
+              <div *ngIf="song.audioMetadata.common.picture">
+                <div *ngFor="let picture of song.audioMetadata.common.picture">
+                  <img class="img-thumbnail-album"
+                       src="data:{{ picture.format }};base64,{{picture.data.toString('base64')}}"
+                       alt="{{ picture.description }}">
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div class="title-artist-album">
-          <div class="title">
-            <div *ngIf="song.title">
-              <h4>Title: {{ song.title }}</h4>
+          <div class="title-artist-album">
+            <div class="title">
+              <div *ngIf="song.title">
+                <h4>Title: {{ song.title }}</h4>
+              </div>
+            </div>
+            <div class="artist">
+              <p *ngIf="song.audioMetadata.common">
+                <span class="artist">{{ song.audioMetadata.common.artist }}</span>
+              </p>
+            </div>
+            <div class="album">
+              <p *ngIf="song.audioMetadata.common">
+                Album: <span class="album">{{ song.audioMetadata.common.album }}</span>
+              </p>
             </div>
           </div>
-          <div class="artist">
-            <p *ngIf="song.audioMetadata.common">
-              <span class="artist">{{ song.audioMetadata.common.artist }}</span>
-            </p>
-          </div>
-          <div class="album">
-            <p *ngIf="song.audioMetadata.common">
-              Album: <span class="album">{{ song.audioMetadata.common.album }}</span>
-            </p>
-          </div>
         </div>
-      </div>
 
-      <div class="controllers">
-        <button mat-button (click)="showInfo(song)">Click to see song in debug</button>
-      </div>
+        <div class="controllers">
+          <button mat-button (click)="showInfo(song)">Click to see song in debug</button>
+          <button mat-button (click)="playSong(song)">Play song</button>
+        </div>
 
-      <div *ngIf="song.audioMetadata">
-        <!--<div *ngFor="let key of song.audioMetadata.common">
+      </mat-expansion-panel>
 
-          <table class="table">
-            <tr>
-              <th>Label</th>
-              <th>Value</th>
-              <th>Property name</th>
-            </tr>
-
-            <tr><td>{{key}}</td></tr>
-
-          </table>
-        </div>-->
-      </div>
+    </mat-accordion>
 
 
-    </mat-expansion-panel>
-
-  </mat-accordion>
-
-
+  </div>
 </div>
