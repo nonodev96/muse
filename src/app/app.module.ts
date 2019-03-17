@@ -20,9 +20,11 @@ import {
   MatSliderModule,
   MatIconModule,
   MatListModule,
-  MatToolbarModule,
   MatExpansionModule,
-  MatSnackBarModule
+  MatSnackBarModule,
+  MatToolbarModule,
+  MatFormFieldModule,
+  MatInputModule
 } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -64,9 +66,11 @@ export function HttpLoaderFactory(http: HttpClient) {
     MatSliderModule,
     MatIconModule,
     MatListModule,
-    MatToolbarModule,
     MatExpansionModule,
     MatSnackBarModule,
+    MatToolbarModule,
+    MatFormFieldModule,
+    MatInputModule,
     BrowserModule,
     FormsModule,
     HttpClientModule,

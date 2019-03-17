@@ -10,13 +10,13 @@ export interface InterfaceFavorites {
   paths: string[];
 }
 
-export interface InterfacePlaylist {
+export interface InterfacePlayList {
   name: string;
   paths: string[];
 }
 
-export interface InterfacePlaylists {
-  playlists: InterfacePlaylist[];
+export interface InterfacePlayLists {
+  playLists: InterfacePlayList[];
 }
 
 export interface InterfaceFavoriteToDelete {
@@ -107,21 +107,22 @@ export class DatabaseService {
 
   public createPlayList(nameNewPlaylist: string): Promise<string | boolean> {
     let dataBaseJsonPath = this.dataBaseJsonPath;
+
     return new Promise((resolve) => {
-      storage.get(DataBase.playlists, dataBaseJsonPath, function (error_GET, dataJSON_playlists: InterfacePlaylists) {
+      storage.get(DataBase.playlists, dataBaseJsonPath, function (error_GET, dataJSON_playlists: InterfacePlayLists) {
 
         // find playlist in the list of playlists
-        let search = dataJSON_playlists.playlists.find(playlist => {
+        let search = dataJSON_playlists.playLists.find(playlist => {
           return playlist.name === nameNewPlaylist;
         });
 
         // The playlist not exist
         if (search === undefined) {
-          let initNewPlaylist: InterfacePlaylist = {
+          let initNewPlaylist: InterfacePlayList = {
             name: nameNewPlaylist,
             paths: []
           };
-          dataJSON_playlists.playlists.push(initNewPlaylist);
+          dataJSON_playlists.playLists.push(initNewPlaylist);
           storage.set(DataBase.playlists, dataJSON_playlists, dataBaseJsonPath, function (error_SET) {
             if (error_SET !== undefined) {
               console.log('error_SET' + error_SET);
@@ -131,7 +132,7 @@ export class DatabaseService {
             }
           });
         } else {
-          resolve('La playlist "' + nameNewPlaylist + ' ya existe"');
+          resolve('La playlist "' + nameNewPlaylist + '" ya existe');
         }
 
       });
@@ -140,19 +141,19 @@ export class DatabaseService {
 
   public deletePlayList(namePlaylistToDelete: string): Promise<string | boolean> {
     let dataBaseJsonPath = this.dataBaseJsonPath;
+
     return new Promise((resolve) => {
-      storage.get(DataBase.playlists, dataBaseJsonPath, function (error_GET, dataJSON_playlists: InterfacePlaylists) {
+      storage.get(DataBase.playlists, dataBaseJsonPath, function (error_GET, dataJSON_playlists: InterfacePlayLists) {
 
         console.log(dataJSON_playlists);
         // find playlist in the list of playlists
-        let search = dataJSON_playlists.playlists.find(playlist => {
+        let search = dataJSON_playlists.playLists.find(playlist => {
           return playlist.name === namePlaylistToDelete;
         });
-        console.log(search);
 
         // If playlist exist, delete and save
         if (search !== undefined) {
-          dataJSON_playlists.playlists = dataJSON_playlists.playlists.filter(playlist => {
+          dataJSON_playlists.playLists = dataJSON_playlists.playLists.filter(playlist => {
             return playlist.name !== namePlaylistToDelete;
           });
           console.log(dataJSON_playlists);
@@ -167,8 +168,56 @@ export class DatabaseService {
           });
 
         } else {
-          resolve('La playlist "' + namePlaylistToDelete + ' no existe"');
+          resolve('La playlist "' + namePlaylistToDelete + '" no existe');
         }
+      });
+    });
+  }
+
+  public addSongPathToPlayList(namePlayList: string, songPathToPlayList: string): Promise<string | boolean> {
+    let dataBaseJsonPath = this.dataBaseJsonPath;
+
+    return new Promise((resolve) => {
+      storage.get(DataBase.playlists, dataBaseJsonPath, function (error_GET, dataJSON_PlayLists: InterfacePlayLists) {
+
+        let searchPlayList = dataJSON_PlayLists.playLists.find(playList => {
+          return playList.name === namePlayList;
+        });
+
+        if (searchPlayList === undefined) {
+          resolve('La playList ' + namePlayList + ' no existe');
+        } else {
+
+          // Find playlist in the list of playLists
+          dataJSON_PlayLists.playLists.forEach((playlist: InterfacePlayList) => {
+
+            if (playlist.name === namePlayList) {
+
+              // If the PlayList not contains the songPath
+              if (playlist.paths.indexOf(songPathToPlayList) === -1) {
+
+                // Add to playList
+                playlist.paths.push(songPathToPlayList);
+
+                storage.set(DataBase.playlists, dataJSON_PlayLists, dataBaseJsonPath, function (error_SET) {
+                  if (error_SET !== undefined) {
+                    console.log('error_SET' + error_SET);
+                    resolve(false);
+                  } else {
+                    console.log(dataJSON_PlayLists);
+                    resolve(true);
+                  }
+                });
+
+              } else {
+                resolve('La playList ' + namePlayList + ' ya tiene la canción ' + songPathToPlayList);
+              }
+            }
+
+          });
+
+        }
+
       });
     });
   }
@@ -204,8 +253,8 @@ export class DatabaseService {
         }
 
         if (tables.indexOf(DataBase.playlists) === -1) {
-          let initPlaylists: InterfacePlaylists = {
-            playlists: [ {
+          let initPlaylists: InterfacePlayLists = {
+            playLists: [ {
               name: '',
               paths: [ '' ]
             } ]

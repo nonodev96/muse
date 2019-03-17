@@ -13,6 +13,8 @@ import { MatSnackBar } from '@angular/material';
 export class DebugComponent implements OnInit, OnDestroy {
 
   i: number;
+  namePlayList: string = '';
+  nameSongPath: string = '';
 
   constructor(private _databaseService: DatabaseService,
               private _electronService: ElectronService,
@@ -57,33 +59,6 @@ export class DebugComponent implements OnInit, OnDestroy {
     }
   }
 
-  createNewPlaylist() {
-    let songPathToAdd: string = 'playlist ' + this.i;
-    this._databaseService.createPlayList(songPathToAdd).then(value => {
-      if (value === true) {
-        this.openSnackBar('La playlist se ha creado correctamente');
-      } else if (value === false) {
-        this.openSnackBar('La playlist no se ha podido crear por un error');
-      } else {
-        this.openSnackBar(value);
-      }
-    });
-    this.i++;
-  }
-
-  deletePlaylist() {
-    let songPathToAdd: string = 'playlist 3';
-    this._databaseService.deletePlayList(songPathToAdd).then(value => {
-      if (value === true) {
-        this.openSnackBar('La playlist se ha borrado correctamente');
-      } else if (value === false) {
-        this.openSnackBar('La playlist no se ha podido borrar por un error');
-      } else {
-        this.openSnackBar(value);
-      }
-    });
-  }
-
   deleteFavorite() {
     let songPathToDelete: InterfaceFavoriteToDelete = {
       path: 'favorite 5'
@@ -107,9 +82,64 @@ export class DebugComponent implements OnInit, OnDestroy {
     this._databaseService.database();
   }
 
+  createNewPlaylist() {
+    let namePlayListToCreate = this.namePlayList;
+    console.log('Se va a crear la playlist ' + namePlayListToCreate);
+
+    this._databaseService.createPlayList(namePlayListToCreate).then(value => {
+      if (value === true) {
+        this.openSnackBar('La playlist se ha creado correctamente');
+      } else if (value === false) {
+        this.openSnackBar('La playlist no se ha podido crear por un error');
+      } else {
+        this.openSnackBar(value);
+      }
+    });
+  }
+
+  deletePlaylist() {
+    let namePlayListToDelete = this.namePlayList;
+    console.log('Se va a borrar la playlist ' + namePlayListToDelete);
+
+    this._databaseService.deletePlayList(namePlayListToDelete).then(value => {
+      if (value === true) {
+        this.openSnackBar('La playlist se ha borrado correctamente');
+      } else if (value === false) {
+        this.openSnackBar('La playlist no se ha podido borrar por un error');
+      } else {
+        this.openSnackBar(value);
+      }
+    });
+  }
+
+  addSongPathToPlayList() {
+    let namePlayList = this.namePlayList;
+    let nameSongPath = this.nameSongPath;
+    console.log(namePlayList + ' - ' + nameSongPath);
+
+    this._databaseService.addSongPathToPlayList(namePlayList, nameSongPath).then(value => {
+      if (value === true) {
+        this.openSnackBar('Se ha añadido correctamente la canción ' + nameSongPath + ' a la playlist ' + namePlayList);
+      } else if (value === false) {
+        this.openSnackBar('No se ha añadido la canción ' + nameSongPath + ' a la playlist ' + namePlayList + ' por un error');
+      } else {
+        this.openSnackBar(value);
+      }
+    });
+  }
+
+  updateInputPlayList(namePlayList: string) {
+    this.namePlayList = namePlayList;
+  }
+
+  updateInputSongPath(nameSongPath: string) {
+    this.nameSongPath = nameSongPath;
+  }
+
   private openSnackBar(message: string, action: string = 'Undo') {
     this.snackBar.open(message, action, {
       duration: 3000
     });
   }
+
 }

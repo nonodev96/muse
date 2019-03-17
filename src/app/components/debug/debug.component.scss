@@ -1,0 +1,21 @@
+.container {
+  padding: 1em;
+
+  .container-form {
+    display: flex;
+    flex-direction: column;
+
+    .debug-form {
+      min-width: 150px;
+      padding: 0 1em;
+    }
+
+    .debug-full-width {
+      width: 100%;
+    }
+  }
+
+  p {
+    padding: 0 1em;
+  }
+}

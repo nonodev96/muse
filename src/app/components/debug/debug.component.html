@@ -3,9 +3,32 @@
   <button mat-button (click)="deleteFavorite()">deleteFavorite</button>
   <button mat-button (click)="getAllFavorites()">getAllFavorites</button>
   <button mat-button (click)="database()">database</button>
-  <button mat-button (click)="createNewPlaylist()">createNewPlaylist</button>
-  <button mat-button (click)="deletePlaylist()">deletePlaylist</button>
   <button mat-button (click)="data()">data</button>
   <button mat-button (click)="load()">load</button>
+
+  <br>
+  <div class="container-form">
+
+    <form class="debug-form">
+      <mat-form-field class="debug-full-width">
+        <input matInput placeholder="PlayList" [value]="namePlayList" #playList
+               (keyup.enter)="updateInputPlayList(playList.value)"
+               (blur)="updateInputPlayList(playList.value)">
+      </mat-form-field>
+
+      <mat-form-field class="debug-full-width">
+        <input matInput placeholder="SongPath" [value]="nameSongPath" #songPath
+               (keyup.enter)="updateInputSongPath(songPath.value)"
+               (blur)="updateInputSongPath(songPath.value)">
+      </mat-form-field>
+    </form>
+  </div>
+  <p>{{ namePlayList}}</p>
+  <p>{{ nameSongPath}}</p>
+
+  <br>
+  <button mat-button (click)="createNewPlaylist()">createNewPlaylist</button>
+  <button mat-button (click)="deletePlaylist()">deletePlaylist</button>
+  <button mat-button (click)="addSongPathToPlayList()">addSongPathToPlayList</button>
 
 </div>
