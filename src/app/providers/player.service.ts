@@ -103,12 +103,13 @@ export class PlayerService {
 
   public setPlayer(song: Song) {
     this.setSong(song);
-    this.audio.src = song.src;
+    // this.audio.src = song.src;
+    this.audio.src = './assets/Izal - 02 - Copacabana.mp3';
     this.audio.load();
     this.debug();
 
-    this.songObservable.next(this.song);
-    this.audioObservable.next(this.audio);
+    // this.songObservable.next(this.song);
+    // this.audioObservable.next(this.audio);
 
     this.attachListeners();
   }
@@ -173,10 +174,10 @@ export class PlayerService {
   private initPlayerFromMusicFiles(musicFiles: string[]) {
     let differenceMusicFiles: string[] = <string[]>Array.from(this.setDifference(new Set(musicFiles), new Set(this.musicFiles)));
     this.musicFiles = <string[]>Array.from(this.setUnion(new Set(this.musicFiles), new Set(musicFiles)));
-    console.log(differenceMusicFiles);
+    // console.log(differenceMusicFiles);
     this._databaseService.addSongsPathToPlayList(DataBase.songsLoad, differenceMusicFiles).then(value => {
 
-      console.log(value);
+      // console.log(value);
 
     });
 
