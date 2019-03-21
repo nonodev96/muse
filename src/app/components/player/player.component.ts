@@ -2,7 +2,7 @@ import { Component, HostBinding, HostListener, OnDestroy, OnInit } from '@angula
 import { MatSliderChange } from '@angular/material';
 import { PlayerService } from '../../providers/player.service';
 import { Subscription } from 'rxjs';
-import { Song } from '../../mock/Song';
+import { Song } from '../../mocks/Song';
 
 @Component({
   selector: 'app-player',

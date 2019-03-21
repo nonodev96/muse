@@ -43,49 +43,61 @@ export class AudioVisualizerComponent implements OnInit, OnDestroy, AfterViewIni
       this.audio = new Audio();
       this.audioContext = new AudioContext();
     }
-    this.innerWidth = window.innerWidth;
-    this.innerHeight = window.innerHeight - 200;
 
     this.x = 0;
   }
 
   ngOnInit() {
-    console.log('ngOnInit Visualizer');
+    // console.log('ngOnInit Visualizer');
     this.audioSubscription = this._playerService.getAudioObservable()
       .subscribe((audio: HTMLAudioElement) => {
-        console.log('subscribe Visualizer');
+        // console.log('subscribe audio');
         this.audio = audio;
       });
     this.ANALYSER_NODES_Subscription = this._playerService.get_MEDIA_ELEMENT_NODES_Observable()
       .subscribe((ANALYSER_NODES: WeakMap<HTMLAudioElement, AnalyserNode>) => {
-        console.log('subscribe NODES');
+        // console.log('subscribe NODES');
         this.ANALYSER_NODES = ANALYSER_NODES;
+        if (this.audio.src !== '') {
+          if (this.ANALYSER_NODES.has(this.audio)) {
+            // console.log('subscribe audio !== ""');
+            this.audioContextAnalyserNode = this.ANALYSER_NODES.get(this.audio);
+          } else {
+            this.sourceMediaElementContextAudio = this.audioContext.createMediaElementSource(this.audio);
+            this.sourceMediaElementContextAudio.connect(this.audioContextAnalyserNode);
+            this.audioContextAnalyserNode.connect(this.audioContext.destination);
 
-        if (this.ANALYSER_NODES.has(this.audio)) {
-          this.audioContextAnalyserNode = this.ANALYSER_NODES.get(this.audio);
-        } else {
-          this.sourceMediaElementContextAudio = this.audioContext.createMediaElementSource(this.audio);
-          this.sourceMediaElementContextAudio.connect(this.audioContextAnalyserNode);
-          this.audioContextAnalyserNode.connect(this.audioContext.destination);
-
-          this.ANALYSER_NODES.set(this.audio, this.audioContextAnalyserNode);
+            this.ANALYSER_NODES.set(this.audio, this.audioContextAnalyserNode);
+          }
+          if (this.audio.paused === false) {
+            this.draw();
+          }
         }
-        this.draw();
       });
 
   }
 
   ngAfterViewInit(): void {
-    console.log('ngAfterViewInit Visualizer');
-    // this._playerService.updateAudioSubscription();
-    // this._playerService.update_ANALYSER_NODES_Subscription();
+    // console.log('ngAfterViewInit Visualizer');
+    this.innerWidth = window.innerWidth;
+    this.innerHeight = window.innerHeight - 200;
+    this.canvasContext = (<HTMLCanvasElement>this.canvasAudioVisualizerID.nativeElement).getContext('2d');
+    this.canvasContext.canvas.style.width = '100%';
+    this.canvasContext.canvas.style.height = '100%';
+    this.canvasContext.canvas.width = this.canvasContext.canvas.offsetWidth;
+    this.canvasContext.canvas.height = this.canvasContext.canvas.offsetHeight;
+    this.canvasContext.fillStyle = '#222';
+    this.canvasContext.fillRect(0, 0, this.WIDTH, this.HEIGHT);
+
+    this._playerService.updateAudioSubscription();
+    this._playerService.update_ANALYSER_NODES_Subscription();
   }
 
 
   ngOnDestroy(): void {
-    console.log('ngOnDestroy Visualizer');
+    // console.log('ngOnDestroy Visualizer');
     if (this.ANALYSER_NODES.has(this.audio)) {
-      console.log('ANALYSER_NODES.has Visualizer');
+      // console.log('ANALYSER_NODES.has Visualizer');
       // this.sourceMediaElementContextAudio.disconnect();
       // this.audioContextAnalyserNode.disconnect();
     }
@@ -94,14 +106,7 @@ export class AudioVisualizerComponent implements OnInit, OnDestroy, AfterViewIni
   }
 
   private draw() {
-    console.log('draw Visualizer');
-    this.canvasContext = (<HTMLCanvasElement>this.canvasAudioVisualizerID.nativeElement).getContext('2d');
-
-    this.canvasContext.canvas.style.width = '100%';
-    this.canvasContext.canvas.style.height = '100%';
-    this.canvasContext.canvas.width = this.canvasContext.canvas.offsetWidth;
-    this.canvasContext.canvas.height = this.canvasContext.canvas.offsetHeight;
-
+    // console.log('draw Visualizer');
     this.audioContextAnalyserNode.fftSize = 256;
 
     this.bufferLength = this.audioContextAnalyserNode.frequencyBinCount;
@@ -114,6 +119,7 @@ export class AudioVisualizerComponent implements OnInit, OnDestroy, AfterViewIni
     this.x = 0;
 
     this.renderFrame();
+
   }
 
   renderFrame() {
@@ -130,8 +136,8 @@ export class AudioVisualizerComponent implements OnInit, OnDestroy, AfterViewIni
       this.barHeight = this.dataArray[i];
 
       let r = this.barHeight + (25 * (i / this.bufferLength));
-      let g = 250 * (i / this.bufferLength);
-      let b = 150;
+      let g = 170 * (i / this.bufferLength);
+      let b = 190;
 
       this.canvasContext.fillStyle = 'rgb(' + r + ',' + g + ',' + b + ')';
       this.canvasContext.fillRect(this.x, this.HEIGHT - this.barHeight, this.barWidth, this.barHeight);

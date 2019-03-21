@@ -1,10 +1,11 @@
 import {Injectable} from '@angular/core';
 import {Observable, Subject} from 'rxjs';
-import {Song} from '../mock/Song';
+import {Song} from '../mocks/Song';
 import {FileService} from './file.service';
 import {IAudioMetadata} from 'music-metadata/lib/type';
 import {ElectronService} from './electron.service';
 import {DataBase, DatabaseService, InterfacePlayList} from './database.service';
+import {Utils} from '../utils/utils';
 
 
 interface InterfaceDataPlayer {
@@ -123,10 +124,9 @@ export class PlayerService {
 
   public setPlayer(song: Song) {
     this.setSong(song);
-    // this.audio.src = song.src;
-    this.audio.src = './assets/08 - Gibu.mp3';
+    this.audio.src = song.src;
+    // this.audio.src = './assets/08 - Gibu.mp3';
     this.audio.load();
-
 
     if (this.ANALYSER_NODES.has(this.audio)) {
       this.audioContextAnalyserNode = this.ANALYSER_NODES.get(this.audio);
@@ -140,9 +140,6 @@ export class PlayerService {
 
       this.ANALYSER_NODES.set(this.audio, this.audioContextAnalyserNode);
     }
-
-    this.debug();
-
 
     this.attachListeners();
   }
@@ -206,8 +203,8 @@ export class PlayerService {
   }
 
   private initPlayerFromMusicFiles(musicFiles: string[]) {
-    let differenceMusicFiles: string[] = <string[]>Array.from(this.setDifference(new Set(musicFiles), new Set(this.musicFiles)));
-    this.musicFiles = <string[]>Array.from(this.setUnion(new Set(this.musicFiles), new Set(musicFiles)));
+    let differenceMusicFiles: string[] = <string[]>Array.from(Utils.setDifference(new Set(musicFiles), new Set(this.musicFiles)));
+    this.musicFiles = <string[]>Array.from(Utils.setUnion(new Set(this.musicFiles), new Set(musicFiles)));
     // console.log(differenceMusicFiles);
     this._databaseService.addSongsPathToPlayList(DataBase.songsLoad, differenceMusicFiles).then(value => {
 
@@ -253,46 +250,6 @@ export class PlayerService {
       });
 
     });
-  }
-
-  private toConsumableArray(arr): any {
-    return this.arrayWithoutHoles(arr) || this.iterableToArray(arr) || this.nonIterableSpread();
-  }
-
-  private nonIterableSpread() {
-    throw new TypeError('Invalid attempt to spread non-iterable instance');
-  }
-
-  private iterableToArray(iter) {
-    if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === '[object Arguments]') {
-      return Array.from(iter);
-    }
-  }
-
-  private arrayWithoutHoles(arr) {
-    if (Array.isArray(arr)) {
-      let arr2 = new Array(arr.length);
-      for (let i = 0; i < arr.length; i++) {
-        arr2[i] = arr[i];
-      }
-      return arr2;
-    }
-  }
-
-  private setDifference(a, b) {
-    return new Set(this.toConsumableArray(a).filter(function (x) {
-      return !b.has(x);
-    }));
-  }
-
-  private setIntersection(a, b) {
-    return new Set(this.toConsumableArray(a).filter(function (x) {
-      return b.has(x);
-    }));
-  }
-
-  private setUnion(a, b) {
-    return new Set([].concat(this.toConsumableArray(a), this.toConsumableArray(b)));
   }
 
   private debug() {
