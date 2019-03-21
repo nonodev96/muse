@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import { interval, Subscription } from 'rxjs';
 import {PlayerService} from '../../providers/player.service';
-import { Song } from '../../mock/Song';
+import { Song } from '../../mocks/Song';
 
 @Component({
   selector: 'app-song',

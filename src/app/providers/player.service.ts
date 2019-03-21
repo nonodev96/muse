@@ -1,13 +1,15 @@
-import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
-import { Song } from '../mock/Song';
-import { FileService } from './file.service';
-import { IAudioMetadata } from 'music-metadata/lib/type';
-import { ElectronService } from './electron.service';
-import { DataBase, DatabaseService, InterfacePlayList } from './database.service';
+import {Injectable} from '@angular/core';
+import {Observable, Subject} from 'rxjs';
+import {Song} from '../mocks/Song';
+import {FileService} from './file.service';
+import {IAudioMetadata} from 'music-metadata/lib/type';
+import {ElectronService} from './electron.service';
+import {DataBase, DatabaseService, InterfacePlayList} from './database.service';
+import {Utils} from '../utils/utils';
 
 
 interface InterfaceDataPlayer {
+  ANALYSER_NODES: WeakMap<HTMLAudioElement, AnalyserNode>;
   audio: HTMLAudioElement;
   song: Song;
   songList: Song[];
@@ -18,17 +20,23 @@ interface InterfaceDataPlayer {
   providedIn: 'root'
 })
 export class PlayerService {
-  private audio: HTMLAudioElement;
-  private songList: Song[] = [];
-  private song: Song;
-  private iterator: number = -1;
+  private ANALYSER_NODES: WeakMap<HTMLAudioElement, AnalyserNode> = new WeakMap();
 
+  private audio: HTMLAudioElement;
+  private audioContext: AudioContext;
+  private audioContextAnalyserNode: AnalyserNode;
+  private sourceMediaElementContextAudio: MediaElementAudioSourceNode;
+  private song: Song;
+  private songList: Song[] = [];
+
+  private iterator: number = -1;
   private audioObservable = new Subject<HTMLAudioElement>();
   private songListObservable = new Subject<Song[]>();
   private songObservable = new Subject<Song>();
   private currentTimeObservable = new Subject<number>();
   private durationTimeObservable = new Subject<number>();
   private elapsedTimeObservable = new Subject<number>();
+  private ANALYSER_NODES_Observable = new Subject<WeakMap<HTMLAudioElement, AnalyserNode>>();
   private musicFiles: string[] = [];
 
   constructor(private _fileService: FileService,
@@ -38,6 +46,8 @@ export class PlayerService {
     console.log('init player service');
     this.song = new Song();
     this.audio = new Audio();
+    this.audioContext = new AudioContext();
+    this.audioContextAnalyserNode = this.audioContext.createAnalyser();
     this.audio.volume = 1;
     this.ipcRendererSelectedFiles();
   }
@@ -66,21 +76,32 @@ export class PlayerService {
     return this.elapsedTimeObservable.asObservable();
   }
 
+  public get_MEDIA_ELEMENT_NODES_Observable(): Observable<WeakMap<HTMLAudioElement, AnalyserNode>> {
+    return this.ANALYSER_NODES_Observable.asObservable();
+  }
+
+  public updateAudioSubscription() {
+    this.audioObservable.next(this.audio);
+  }
+
+  public update_ANALYSER_NODES_Subscription() {
+    this.ANALYSER_NODES_Observable.next(this.ANALYSER_NODES);
+  }
+
   public playerTogglePlayPause() {
     if (this.audio.paused === true) {
       let playPromise = this.audio.play();
-      if (playPromise !== undefined) {
-        playPromise.then(() => {
+      playPromise.then(() => {
 
-        }).catch(function (error) {
+      }).catch(function (error) {
 
-        });
-      }
+      });
     } else {
       this.audio.pause();
     }
-    this.audioObservable.next(this.audio);
     this.songObservable.next(this.song);
+    this.audioObservable.next(this.audio);
+    this.ANALYSER_NODES_Observable.next(this.ANALYSER_NODES);
 
     return this.audio.paused;
   }
@@ -90,25 +111,35 @@ export class PlayerService {
       this.iterator = this.songList.length;
     }
     this.iterator--;
-    let song: Song = this.songList[ this.iterator ];
+    let song: Song = this.songList[this.iterator];
     this.setPlayer(song);
   }
 
   public setNextSong() {
     this.iterator++;
     this.iterator = this.iterator % this.songList.length;
-    let song: Song = this.songList[ this.iterator ];
+    let song: Song = this.songList[this.iterator];
     this.setPlayer(song);
   }
 
   public setPlayer(song: Song) {
     this.setSong(song);
     this.audio.src = song.src;
+    // this.audio.src = './assets/08 - Gibu.mp3';
     this.audio.load();
-    this.debug();
 
-    this.songObservable.next(this.song);
-    this.audioObservable.next(this.audio);
+    if (this.ANALYSER_NODES.has(this.audio)) {
+      this.audioContextAnalyserNode = this.ANALYSER_NODES.get(this.audio);
+    } else {
+      this.audioContext = new AudioContext();
+      this.audioContextAnalyserNode = this.audioContext.createAnalyser();
+
+      this.sourceMediaElementContextAudio = this.audioContext.createMediaElementSource(this.audio);
+      this.sourceMediaElementContextAudio.connect(this.audioContextAnalyserNode);
+      this.audioContextAnalyserNode.connect(this.audioContext.destination);
+
+      this.ANALYSER_NODES.set(this.audio, this.audioContextAnalyserNode);
+    }
 
     this.attachListeners();
   }
@@ -163,6 +194,7 @@ export class PlayerService {
 
   public getData(): InterfaceDataPlayer {
     return {
+      'ANALYSER_NODES': this.ANALYSER_NODES,
       'audio': this.audio,
       'song': this.song,
       'songList': this.songList,
@@ -171,17 +203,17 @@ export class PlayerService {
   }
 
   private initPlayerFromMusicFiles(musicFiles: string[]) {
-    let differenceMusicFiles: string[] = <string[]>Array.from(this.setDifference(new Set(musicFiles), new Set(this.musicFiles)));
-    this.musicFiles = <string[]>Array.from(this.setUnion(new Set(this.musicFiles), new Set(musicFiles)));
-    console.log(differenceMusicFiles);
+    let differenceMusicFiles: string[] = <string[]>Array.from(Utils.setDifference(new Set(musicFiles), new Set(this.musicFiles)));
+    this.musicFiles = <string[]>Array.from(Utils.setUnion(new Set(this.musicFiles), new Set(musicFiles)));
+    // console.log(differenceMusicFiles);
     this._databaseService.addSongsPathToPlayList(DataBase.songsLoad, differenceMusicFiles).then(value => {
 
-      console.log(value);
+      // console.log(value);
 
     });
 
     for (let index in differenceMusicFiles) {
-      let pathFile: string = differenceMusicFiles[ index ];
+      let pathFile: string = differenceMusicFiles[index];
       this._fileService.loadAudioMetaDataFromPath(pathFile).then(
         (audioMetadataValue: IAudioMetadata) => {
           this.songList.push(new Song({
@@ -212,52 +244,12 @@ export class PlayerService {
       this._electronService.ipcRenderer.on('selected-files', (event, args) => {
         console.log('es esto un evento?');
         if (args.musicFiles.length > 0) {
-          let arrayMusicFiles: string[] = [ ...args.musicFiles ];
+          let arrayMusicFiles: string[] = [...args.musicFiles];
           this.initPlayerFromMusicFiles(arrayMusicFiles);
         }
       });
 
     });
-  }
-
-  private toConsumableArray(arr): any {
-    return this.arrayWithoutHoles(arr) || this.iterableToArray(arr) || this.nonIterableSpread();
-  }
-
-  private nonIterableSpread() {
-    throw new TypeError('Invalid attempt to spread non-iterable instance');
-  }
-
-  private iterableToArray(iter) {
-    if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === '[object Arguments]') {
-      return Array.from(iter);
-    }
-  }
-
-  private arrayWithoutHoles(arr) {
-    if (Array.isArray(arr)) {
-      let arr2 = new Array(arr.length);
-      for (let i = 0; i < arr.length; i++) {
-        arr2[ i ] = arr[ i ];
-      }
-      return arr2;
-    }
-  }
-
-  private setDifference(a, b) {
-    return new Set(this.toConsumableArray(a).filter(function (x) {
-      return !b.has(x);
-    }));
-  }
-
-  private setIntersection(a, b) {
-    return new Set(this.toConsumableArray(a).filter(function (x) {
-      return b.has(x);
-    }));
-  }
-
-  private setUnion(a, b) {
-    return new Set([].concat(this.toConsumableArray(a), this.toConsumableArray(b)));
   }
 
   private debug() {

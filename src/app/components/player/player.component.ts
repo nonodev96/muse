@@ -2,7 +2,7 @@ import { Component, HostBinding, HostListener, OnDestroy, OnInit } from '@angula
 import { MatSliderChange } from '@angular/material';
 import { PlayerService } from '../../providers/player.service';
 import { Subscription } from 'rxjs';
-import { Song } from '../../mock/Song';
+import { Song } from '../../mocks/Song';
 
 @Component({
   selector: 'app-player',
@@ -20,8 +20,8 @@ export class PlayerComponent implements OnInit, OnDestroy {
   public currentTime: number;
   public isPaused: boolean;
 
-  private songSubscription: Subscription;
   private audioSubscription: Subscription;
+  private songSubscription: Subscription;
   private dataCurrentTimeSubscription: Subscription;
   private dataTotalTimeSubscription: Subscription;
   private dataElapsedTimeSubscription: Subscription;
@@ -54,13 +54,11 @@ export class PlayerComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.audioSubscription = this._playerService.getAudioObservable()
       .subscribe((audio: HTMLAudioElement) => {
-        console.log('tu audio');
         this.audio = audio;
         this.isPaused = !this.audio.paused;
       });
     this.songSubscription = this._playerService.getSongObservable()
       .subscribe((song: Song) => {
-        console.log('tu canción');
         this.song = song;
       });
     this.dataCurrentTimeSubscription = this._playerService.getCurrentTimeObservable()

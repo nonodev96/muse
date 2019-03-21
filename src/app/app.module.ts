@@ -39,6 +39,7 @@ import { SongComponent } from './components/song/song.component';
 import { AlbumComponent } from './components/album/album.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { DebugComponent } from './components/debug/debug.component';
+import { AudioVisualizerComponent } from './components/audio-visualizer/audio-visualizer.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -58,7 +59,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     SongComponent,
     AlbumComponent,
     DashboardComponent,
-    DebugComponent
+    DebugComponent,
+    AudioVisualizerComponent
   ],
   imports: [
     BrowserAnimationsModule,

@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Song } from '../../mock/Song';
+import { Song } from '../../mocks/Song';
 import { PlayerService } from '../../providers/player.service';
 import { Subscription } from 'rxjs';
 
