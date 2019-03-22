@@ -1,3 +1,7 @@
+## 0.1.1 (2019-03-21)
+
+* issue/ issue-6 Audio visualizer
+
 ## 0.0.9 (2019-03-17)
 
 * issue/ issue-4 Save PlayLists, Favorites and Load songs 
