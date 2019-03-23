@@ -1,11 +1,11 @@
-import {Injectable} from '@angular/core';
-import {Observable, Subject} from 'rxjs';
-import {Song} from '../mocks/Song';
-import {FileService} from './file.service';
-import {IAudioMetadata} from 'music-metadata/lib/type';
-import {ElectronService} from './electron.service';
-import {DataBase, DatabaseService, InterfacePlayList} from './database.service';
-import {Utils} from '../utils/utils';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { Song } from '../mocks/Song';
+import { FileService } from './file.service';
+import { IAudioMetadata } from 'music-metadata/lib/type';
+import { ElectronService } from './electron.service';
+import { DataBase, DatabaseService, InterfacePlayList } from './database.service';
+import { Utils } from '../utils/utils';
 
 
 interface InterfaceDataPlayer {
@@ -28,9 +28,10 @@ export class PlayerService {
   private sourceMediaElementContextAudio: MediaElementAudioSourceNode;
   private song: Song;
   private songList: Song[] = [];
-
   private iterator: number = -1;
-  private audioObservable = new Subject<HTMLAudioElement>();
+
+  private playerStatus: BehaviorSubject<string> = new BehaviorSubject('paused');
+  private audioObservable: Subject<HTMLAudioElement> = new Subject<HTMLAudioElement>();
   private songListObservable = new Subject<Song[]>();
   private songObservable = new Subject<Song>();
   private currentTimeObservable = new Subject<number>();
@@ -43,13 +44,13 @@ export class PlayerService {
               private _databaseService: DatabaseService,
               private _electronService: ElectronService
   ) {
-    console.log('init player service');
     this.song = new Song();
     this.audio = new Audio();
+    this.audio.volume = 0.15;
     this.audioContext = new AudioContext();
     this.audioContextAnalyserNode = this.audioContext.createAnalyser();
-    this.audio.volume = 1;
     this.ipcRendererSelectedFiles();
+    this.attachListeners();
   }
 
   public getSongListObservable(): Observable<Song[]> {
@@ -80,6 +81,14 @@ export class PlayerService {
     return this.ANALYSER_NODES_Observable.asObservable();
   }
 
+  public updateSongSubscription() {
+    this.songObservable.next(this.song);
+  }
+
+  public updateSongListSubscription() {
+    this.songListObservable.next(this.songList);
+  }
+
   public updateAudioSubscription() {
     this.audioObservable.next(this.audio);
   }
@@ -93,7 +102,7 @@ export class PlayerService {
       let playPromise = this.audio.play();
       playPromise.then(() => {
 
-      }).catch(function (error) {
+      }).catch((error) => {
 
       });
     } else {
@@ -111,21 +120,21 @@ export class PlayerService {
       this.iterator = this.songList.length;
     }
     this.iterator--;
-    let song: Song = this.songList[this.iterator];
+    let song: Song = this.songList[ this.iterator ];
     this.setPlayer(song);
   }
 
   public setNextSong() {
     this.iterator++;
     this.iterator = this.iterator % this.songList.length;
-    let song: Song = this.songList[this.iterator];
+    let song: Song = this.songList[ this.iterator ];
     this.setPlayer(song);
   }
 
   public setPlayer(song: Song) {
     this.setSong(song);
-    this.audio.src = song.src;
-    // this.audio.src = './assets/08 - Gibu.mp3';
+    // this.audio.src = song.src;
+    this.audio.src = './assets/08 - Gibu.mp3';
     this.audio.load();
 
     if (this.ANALYSER_NODES.has(this.audio)) {
@@ -140,8 +149,6 @@ export class PlayerService {
 
       this.ANALYSER_NODES.set(this.audio, this.audioContextAnalyserNode);
     }
-
-    this.attachListeners();
   }
 
   public getAudio(): HTMLAudioElement {
@@ -184,11 +191,45 @@ export class PlayerService {
     this.audio.currentTime = time;
   }
 
+  private setPlayerStatus(key) {
+    switch (key) {
+      case 'playing':
+        this.playerStatus.next('playing');
+        break;
+      case 'pause':
+        this.playerStatus.next('paused');
+        break;
+      case 'waiting':
+        this.playerStatus.next('loading');
+        break;
+      case 'ended':
+        this.playerStatus.next('ended');
+        break;
+      default:
+        this.playerStatus.next('paused');
+        break;
+    }
+  }
+
   private attachListeners() {
     this.audio.addEventListener('timeupdate', () => {
       this.currentTimeObservable.next(this.audio.currentTime);
       this.durationTimeObservable.next(this.audio.duration);
       this.elapsedTimeObservable.next(this.audio.duration - this.audio.currentTime);
+    });
+    this.audio.addEventListener('playing', () => {
+      this.setPlayerStatus('playing');
+    });
+    this.audio.addEventListener('waiting', () => {
+      this.setPlayerStatus('waiting');
+    });
+    this.audio.addEventListener('pause', () => {
+      this.setPlayerStatus('pause');
+    });
+    this.audio.addEventListener('ended', () => {
+      this.setPlayerStatus('ended');
+      this.setNextSong();
+      this.playerTogglePlayPause();
     });
   }
 
@@ -213,17 +254,27 @@ export class PlayerService {
     });
 
     for (let index in differenceMusicFiles) {
-      let pathFile: string = differenceMusicFiles[index];
+      let pathFile: string = differenceMusicFiles[ index ];
       this._fileService.loadAudioMetaDataFromPath(pathFile).then(
         (audioMetadataValue: IAudioMetadata) => {
-          this.songList.push(new Song({
+
+          let newSong = new Song({
             id: '1',
             title: audioMetadataValue.common.title,
             album: audioMetadataValue.common.album,
             artist: audioMetadataValue.common.artist,
             src: pathFile,
             audioMetadata: audioMetadataValue
-          }));
+          });
+          if (audioMetadataValue.common.picture !== undefined) {
+            let picture = audioMetadataValue.common.picture[ 0 ];
+            if (picture !== undefined) {
+              newSong.imgData = 'data:' + picture.format + ';base64,' + picture.data.toString('base64');
+            }
+          }
+
+          this.songList.push(newSong);
+
           this.songListObservable.next(this.songList);
         });
     }
@@ -234,7 +285,7 @@ export class PlayerService {
    */
   private ipcRendererSelectedFiles() {
     this._databaseService.getPlayListsByName(DataBase.songsLoad).then((songsLoad: InterfacePlayList) => {
-      console.log(songsLoad);
+      // console.log(songsLoad);
       if (songsLoad.paths.length > 0) {
         this.initPlayerFromMusicFiles(songsLoad.paths);
       } else {
@@ -244,7 +295,7 @@ export class PlayerService {
       this._electronService.ipcRenderer.on('selected-files', (event, args) => {
         console.log('es esto un evento?');
         if (args.musicFiles.length > 0) {
-          let arrayMusicFiles: string[] = [...args.musicFiles];
+          let arrayMusicFiles: string[] = [ ...args.musicFiles ];
           this.initPlayerFromMusicFiles(arrayMusicFiles);
         }
       });

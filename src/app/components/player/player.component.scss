@@ -1,9 +1,11 @@
 
 .player {
+  position: relative;
+  bottom: 0;
   width: 100%;
-  min-width: 620px;
-  height: 90px;
-  border-bottom: 2px solid mediumvioletred;
+  //min-width: 620px;
+  height: 96px;
+  //border-bottom: 2px solid mediumvioletred;
   display: grid;
   grid-gap: 10px;
   color: whitesmoke;
@@ -19,6 +21,7 @@
 
     .picture {
       grid-column-start: 1;
+      padding: 1em;
 
       img.img-thumbnail {
         height: 100%;
@@ -90,8 +93,8 @@
   .volume {
     grid-column-start: 3;
     display: grid;
-    align-items: end;
-    grid-template-columns: auto;
+    align-items: start;
+    grid-template-rows: 1fr 1fr;
     justify-content: center;
   }
 }

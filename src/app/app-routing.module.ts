@@ -6,11 +6,13 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { DebugComponent } from './components/debug/debug.component';
 import { SongComponent } from './components/song/song.component';
 import { AudioVisualizerComponent } from './components/audio-visualizer/audio-visualizer.component';
+import { LibraryComponent } from './components/library/library.component';
 
 const routes: Routes = [
 //    { path: '', component: HomeComponent },
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
   { path: 'dashboard', component: DashboardComponent },
+  { path: 'library', component: LibraryComponent },
   { path: 'settings', component: SettingsComponent },
   { path: 'debug', component: DebugComponent },
   { path: 'song', component: SongComponent },

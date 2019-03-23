@@ -1,13 +1,59 @@
-<app-player></app-player>
+<mat-sidenav-container class="mat-sidenav-container">
 
-<nav>
-  <ol>
-    <li><a routerLink="/dashboard">Dashboard</a></li>
-    <li><a routerLink="/settings">Settings</a></li>
-    <li><a routerLink="/audio-visualizer">Visualizer</a></li>
-    <li><a routerLink="/song">Song</a></li>
-    <li><a routerLink="/debug">Debug</a></li>
-  </ol>
-</nav>
+  <mat-sidenav #elementSidenavID mode="over">
+    <mat-nav-list>
+      <h2 mat-subheader> {{ SIDENAV_HEADER_TITLE }} </h2>
+      <mat-divider></mat-divider>
 
-<router-outlet></router-outlet>
+      <a mat-list-item (click)="closeSidenav()" routerLink="/dashboard">
+        <mat-icon mat-list-icon>queue_music</mat-icon>
+        <p mat-line>Dashboard</p>
+      </a>
+      <a mat-list-item (click)="closeSidenav()" routerLink="/library">
+        <mat-icon mat-list-icon>library_music</mat-icon>
+        <p mat-line>Library</p>
+      </a>
+      <a mat-list-item (click)="closeSidenav()" routerLink="/audio-visualizer">
+        <mat-icon mat-list-icon>album</mat-icon>
+        <p mat-line>Visualizer</p>
+      </a>
+      <a mat-list-item (click)="closeSidenav()" routerLink="/song">
+        <mat-icon mat-list-icon>music_note</mat-icon>
+        <p mat-line>Song</p>
+      </a>
+
+      <mat-divider></mat-divider>
+
+      <a mat-list-item (click)="closeSidenav()" routerLink="/settings">
+        <mat-icon mat-list-icon>settings</mat-icon>
+        <p mat-line>Settings</p>
+      </a>
+      <a mat-list-item (click)="closeSidenav()" routerLink="/debug">
+        <mat-icon mat-list-icon>memory</mat-icon>
+        <p mat-line>Debug</p>
+      </a>
+
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+
+    <mat-toolbar color="primary">
+      <mat-toolbar-row>
+        <button mat-icon-button (click)="toggleSidenav()">
+          <mat-icon>menu</mat-icon>
+        </button>
+
+        <span> {{ TOOLBAR_TITLE }} </span>
+        <span class="toolbar-spacer"></span>
+        <mat-icon class="toolbar-icon" aria-hidden="false" aria-label="Add to favorite playlist">favorite</mat-icon>
+        <mat-icon class="toolbar-icon" aria-hidden="false" aria-label="Delete from favorite playlist">delete</mat-icon>
+      </mat-toolbar-row>
+    </mat-toolbar>
+
+    <app-player></app-player>
+    <router-outlet></router-outlet>
+
+  </mat-sidenav-content>
+
+</mat-sidenav-container>

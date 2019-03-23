@@ -38,7 +38,6 @@ export class DatabaseService {
   constructor() {
     this.dataBaseJsonPath = storage.getDataPath();
     this.initDataBase();
-    console.log('inicia aqui');
   }
 
   public addFavorite(songPathToAdd: InterfaceFavoriteToAdd): Promise<string | boolean> {
