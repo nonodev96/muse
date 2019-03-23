@@ -1,7 +1,9 @@
 {
+  "APP_TOOLBAR_TITLE": "University",
+  "APP_SIDENAV_HEADER_TITLE": "Sub header",
   "PAGES": {
-      "HOME": {
-          "TITLE": "App works !"
-      }
+    "HOME": {
+      "TITLE": "App works !"
+    }
   }
 }

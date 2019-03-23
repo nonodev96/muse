@@ -1,0 +1,13 @@
+.container {
+  margin: 1em;
+
+  table.form-filters tr {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    grid-column-gap: 1em;
+  }
+
+  table.form-songs {
+    width: 100%;
+  }
+}

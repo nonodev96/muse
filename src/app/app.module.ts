@@ -2,29 +2,52 @@ import 'reflect-metadata';
 import '../polyfills';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
-
 import { AppRoutingModule } from './app-routing.module';
 
 // NG Translate
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
-
 import { ElectronService } from './providers/electron.service';
 
 import { WebviewDirective } from './directives/webview.directive';
 import {
-  MatButtonModule,
-  MatSliderModule,
-  MatIconModule,
-  MatListModule,
-  MatExpansionModule,
-  MatSnackBarModule,
-  MatToolbarModule,
+  MatAutocompleteModule,
+  MatCheckboxModule,
+  MatDatepickerModule,
   MatFormFieldModule,
-  MatInputModule
+  MatInputModule,
+  MatRadioModule,
+  MatSelectModule,
+  MatSliderModule,
+  MatSlideToggleModule,
+  MatMenuModule,
+  MatSidenavModule,
+  MatToolbarModule,
+  MatCardModule,
+  MatDividerModule,
+  MatExpansionModule,
+  MatGridListModule,
+  MatListModule,
+  MatStepperModule,
+  MatTabsModule,
+  MatTreeModule,
+  MatButtonModule,
+  MatButtonToggleModule,
+  MatBadgeModule,
+  MatChipsModule,
+  MatIconModule,
+  MatProgressSpinnerModule,
+  MatProgressBarModule,
+  MatRippleModule,
+  MatBottomSheetModule,
+  MatDialogModule,
+  MatSnackBarModule,
+  MatTooltipModule,
+  MatPaginatorModule,
+  MatSortModule,
+  MatTableModule
 } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -40,6 +63,7 @@ import { AlbumComponent } from './components/album/album.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { DebugComponent } from './components/debug/debug.component';
 import { AudioVisualizerComponent } from './components/audio-visualizer/audio-visualizer.component';
+import { LibraryComponent } from './components/library/library.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -60,21 +84,49 @@ export function HttpLoaderFactory(http: HttpClient) {
     AlbumComponent,
     DashboardComponent,
     DebugComponent,
-    AudioVisualizerComponent
+    AudioVisualizerComponent,
+    LibraryComponent
   ],
   imports: [
     BrowserAnimationsModule,
-    MatButtonModule,
-    MatSliderModule,
-    MatIconModule,
-    MatListModule,
-    MatExpansionModule,
-    MatSnackBarModule,
-    MatToolbarModule,
+    MatAutocompleteModule,
+    MatCheckboxModule,
+    MatDatepickerModule,
     MatFormFieldModule,
     MatInputModule,
+    MatRadioModule,
+    MatSelectModule,
+    MatSliderModule,
+    MatSlideToggleModule,
+    MatMenuModule,
+    MatSidenavModule,
+    MatToolbarModule,
+    MatCardModule,
+    MatDividerModule,
+    MatExpansionModule,
+    MatGridListModule,
+    MatListModule,
+    MatStepperModule,
+    MatTabsModule,
+    MatTreeModule,
+    MatButtonModule,
+    MatButtonToggleModule,
+    MatBadgeModule,
+    MatChipsModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatProgressBarModule,
+    MatRippleModule,
+    MatBottomSheetModule,
+    MatDialogModule,
+    MatSnackBarModule,
+    MatTooltipModule,
+    MatPaginatorModule,
+    MatSortModule,
+    MatTableModule,
     BrowserModule,
     FormsModule,
+    ReactiveFormsModule,
     HttpClientModule,
     AppRoutingModule,
     TranslateModule.forRoot({

@@ -1,11 +1,11 @@
-import {AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {PlayerService} from '../../providers/player.service';
-import {Subscription} from 'rxjs';
+import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { PlayerService } from '../../providers/player.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-audio-visualizer',
   templateUrl: './audio-visualizer.component.html',
-  styleUrls: ['./audio-visualizer.component.scss']
+  styleUrls: [ './audio-visualizer.component.scss' ]
 })
 export class AudioVisualizerComponent implements OnInit, OnDestroy, AfterViewInit {
   private ANALYSER_NODES: WeakMap<HTMLAudioElement, AnalyserNode> = new WeakMap();
@@ -31,7 +31,7 @@ export class AudioVisualizerComponent implements OnInit, OnDestroy, AfterViewIni
 
   private _eventHostListenerWindowResize;
 
-  @HostListener('window:resize', ['$event'])
+  @HostListener('window:resize', [ '$event' ])
   onResize(event) {
     this._eventHostListenerWindowResize = event;
     this.innerWidth = window.innerWidth;
@@ -60,7 +60,6 @@ export class AudioVisualizerComponent implements OnInit, OnDestroy, AfterViewIni
         this.ANALYSER_NODES = ANALYSER_NODES;
         if (this.audio.src !== '') {
           if (this.ANALYSER_NODES.has(this.audio)) {
-            // console.log('subscribe audio !== ""');
             this.audioContextAnalyserNode = this.ANALYSER_NODES.get(this.audio);
           } else {
             this.sourceMediaElementContextAudio = this.audioContext.createMediaElementSource(this.audio);
@@ -81,6 +80,8 @@ export class AudioVisualizerComponent implements OnInit, OnDestroy, AfterViewIni
     // console.log('ngAfterViewInit Visualizer');
     this.innerWidth = window.innerWidth;
     this.innerHeight = window.innerHeight - 200;
+    this.WIDTH = window.innerWidth;
+    this.HEIGHT = window.innerHeight - 200;
     this.canvasContext = (<HTMLCanvasElement>this.canvasAudioVisualizerID.nativeElement).getContext('2d');
     this.canvasContext.canvas.style.width = '100%';
     this.canvasContext.canvas.style.height = '100%';
@@ -119,7 +120,6 @@ export class AudioVisualizerComponent implements OnInit, OnDestroy, AfterViewIni
     this.x = 0;
 
     this.renderFrame();
-
   }
 
   renderFrame() {
@@ -133,7 +133,7 @@ export class AudioVisualizerComponent implements OnInit, OnDestroy, AfterViewIni
     let bufferLengthTMP = this.bufferLength;
 
     for (let i = 0; i < bufferLengthTMP; i++) {
-      this.barHeight = this.dataArray[i];
+      this.barHeight = this.dataArray[ i ];
 
       let r = this.barHeight + (25 * (i / this.bufferLength));
       let g = 170 * (i / this.bufferLength);

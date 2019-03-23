@@ -21,38 +21,34 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.getSongList();
+    this.songListSubscription = this._playerService.getSongListObservable().subscribe((songList: Song[]) => {
+      this.songListInFolder = songList;
+    });
   }
 
   ngOnDestroy(): void {
     this.songListSubscription.unsubscribe();
   }
 
-  loadDashboard() {
-    this.getSongList();
+  public loadDashboard() {
+    this._playerService.updateSongListSubscription();
   }
 
-  showInfo(song: Song) {
+  public showInfo(song: Song) {
     console.log('showInfo');
     console.log(song);
-    console.log('song');
+    console.log('end showInfo');
   }
 
-  debug() {
+  public playSong(song: Song) {
+    this._playerService.setPlayer(song);
+    this._playerService.playerTogglePlayPause();
+  }
+
+  public debug() {
     console.log({
       'panelOpenState': this.panelOpenState,
       'songListInFolder': this.songListInFolder
     });
-  }
-
-  private getSongList() {
-    this.songListSubscription = this._playerService.getSongListObservable().subscribe((songList: Song[]) => {
-      this.songListInFolder = songList;
-    });
-  }
-
-  playSong(song: Song) {
-    this._playerService.setPlayer(song);
-    this._playerService.playerTogglePlayPause();
   }
 }

@@ -31,7 +31,6 @@ export class PlayerComponent implements OnInit, OnDestroy {
     this.song = this._playerService.getSong();
     this.volume = this._playerService.getVolume();
     this.isPaused = false;
-    console.log('construct');
   }
 
   @HostListener('window:keyup', [ '$event' ])
