@@ -43,7 +43,7 @@ export class SongComponent implements OnInit, OnDestroy {
   }
 
   startTimer() {
-    this.interval.setInterval(() => {
+    this.interval = setInterval(() => {
       this.rotateCassette();
     }, this.timeOut);
   }
