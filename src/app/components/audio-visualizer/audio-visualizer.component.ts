@@ -54,7 +54,7 @@ export class AudioVisualizerComponent implements OnInit, OnDestroy, AfterViewIni
         // console.log('subscribe audio');
         this.audio = audio;
       });
-    this.ANALYSER_NODES_Subscription = this._playerService.get_MEDIA_ELEMENT_NODES_Observable()
+    this.ANALYSER_NODES_Subscription = this._playerService.getAnalyserNODESObservable()
       .subscribe((ANALYSER_NODES: WeakMap<HTMLAudioElement, AnalyserNode>) => {
         // console.log('subscribe NODES');
         this.ANALYSER_NODES = ANALYSER_NODES;
@@ -91,7 +91,7 @@ export class AudioVisualizerComponent implements OnInit, OnDestroy, AfterViewIni
     this.canvasContext.fillRect(0, 0, this.WIDTH, this.HEIGHT);
 
     this._playerService.updateAudioSubscription();
-    this._playerService.update_ANALYSER_NODES_Subscription();
+    this._playerService.updateAnalyserNODESSubscription();
   }
 
 

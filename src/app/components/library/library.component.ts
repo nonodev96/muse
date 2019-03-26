@@ -1,22 +1,22 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { MatPaginator, MatSort, MatTableDataSource } from '@angular/material';
-import { PlayerService } from '../../providers/player.service';
-import { Song } from '../../mocks/Song';
-import { Subscription } from 'rxjs';
-import { FormControl } from '@angular/forms';
-import { type } from 'os';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {MatPaginator, MatSort, MatTableDataSource} from '@angular/material';
+import {PlayerService} from '../../providers/player.service';
+import {Song} from '../../mocks/Song';
+import {Subscription} from 'rxjs';
+import {FormControl} from '@angular/forms';
+import {type} from 'os';
 
 @Component({
   selector: 'app-library',
   templateUrl: './library.component.html',
-  styleUrls: [ './library.component.scss' ]
+  styleUrls: ['./library.component.scss']
 })
 export class LibraryComponent implements OnInit {
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
   public dataSource: MatTableDataSource<Song> = new MatTableDataSource([]);
-  public displayedColumns: string[] = [ 'title', 'album', 'artist' ];
+  public displayedColumns: string[] = ['title', 'album', 'artist'];
   private songListSubscription: Subscription;
 
   titleFilter = new FormControl('');
@@ -45,22 +45,18 @@ export class LibraryComponent implements OnInit {
       this.filterValues.artist = value;
       this.dataSource.filter = JSON.stringify(this.filterValues);
     });
-    this.songListSubscription = this._playerService.getSongListObservable().subscribe((songList: Song[]) => {
-      this.dataSource.data = songList;
-      this.dataSource.sort = this.sort;
-      this.dataSource.paginator = this.paginator;
-    });
+    this.songListSubscription = this._playerService.getSongListObservable()
+      .subscribe((songList: Song[]) => {
+        this.dataSource.data = songList;
+        this.dataSource.sort = this.sort;
+        this.dataSource.paginator = this.paginator;
+      });
     this._playerService.updateSongListSubscription();
   }
 
-  applyFilter(filterValue: string) {
-    this.dataSource.filter = filterValue.trim().toLowerCase();
-
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
-  }
-
+  /**
+   * Override of filters
+   */
   createFilter(): (data: Song, filter: string) => boolean {
     return (data: Song, filter: string): boolean => {
       let searchTerms = JSON.parse(filter.trim().toLowerCase());

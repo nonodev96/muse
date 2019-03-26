@@ -64,6 +64,7 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { DebugComponent } from './components/debug/debug.component';
 import { AudioVisualizerComponent } from './components/audio-visualizer/audio-visualizer.component';
 import { LibraryComponent } from './components/library/library.component';
+import { EqualizerComponent } from './components/equalizer/equalizer.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -85,7 +86,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     DashboardComponent,
     DebugComponent,
     AudioVisualizerComponent,
-    LibraryComponent
+    LibraryComponent,
+    EqualizerComponent
   ],
   imports: [
     BrowserAnimationsModule,

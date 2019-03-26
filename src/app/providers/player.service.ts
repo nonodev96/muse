@@ -1,15 +1,16 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { Song } from '../mocks/Song';
-import { FileService } from './file.service';
-import { IAudioMetadata } from 'music-metadata/lib/type';
-import { ElectronService } from './electron.service';
-import { DataBase, DatabaseService, InterfacePlayList } from './database.service';
-import { Utils } from '../utils/utils';
+import {Injectable} from '@angular/core';
+import {BehaviorSubject, Observable, Subject} from 'rxjs';
+import {Song} from '../mocks/Song';
+import {FileService} from './file.service';
+import {IAudioMetadata} from 'music-metadata/lib/type';
+import {ElectronService} from './electron.service';
+import {DataBase, DatabaseService, InterfacePlayList} from './database.service';
+import {Utils} from '../utils/utils';
 
 
 interface InterfaceDataPlayer {
-  ANALYSER_NODES: WeakMap<HTMLAudioElement, AnalyserNode>;
+  analyserNODES: WeakMap<HTMLAudioElement, AnalyserNode>;
+  contextNODES: WeakMap<HTMLAudioElement, MediaElementAudioSourceNode>;
   audio: HTMLAudioElement;
   song: Song;
   songList: Song[];
@@ -20,25 +21,30 @@ interface InterfaceDataPlayer {
   providedIn: 'root'
 })
 export class PlayerService {
-  private ANALYSER_NODES: WeakMap<HTMLAudioElement, AnalyserNode> = new WeakMap();
+  private analyserNODES: WeakMap<HTMLAudioElement, AnalyserNode> = new WeakMap();
+  private contextNODES: WeakMap<HTMLAudioElement, MediaElementAudioSourceNode> = new WeakMap();
 
   private audio: HTMLAudioElement;
   private audioContext: AudioContext;
+  private mediaElementAudioSourceNode: MediaElementAudioSourceNode;
   private audioContextAnalyserNode: AnalyserNode;
-  private sourceMediaElementContextAudio: MediaElementAudioSourceNode;
   private song: Song;
   private songList: Song[] = [];
   private iterator: number = -1;
+  private musicFiles: string[] = [];
 
   private playerStatus: BehaviorSubject<string> = new BehaviorSubject('paused');
   private audioObservable: Subject<HTMLAudioElement> = new Subject<HTMLAudioElement>();
-  private songListObservable = new Subject<Song[]>();
-  private songObservable = new Subject<Song>();
-  private currentTimeObservable = new Subject<number>();
-  private durationTimeObservable = new Subject<number>();
-  private elapsedTimeObservable = new Subject<number>();
-  private ANALYSER_NODES_Observable = new Subject<WeakMap<HTMLAudioElement, AnalyserNode>>();
-  private musicFiles: string[] = [];
+  private songListObservable: Subject<Song[]> = new Subject<Song[]>();
+  private songObservable: Subject<Song> = new Subject<Song>();
+  private currentTimeObservable: Subject<number> = new Subject<number>();
+  private durationTimeObservable: Subject<number> = new Subject<number>();
+  private elapsedTimeObservable: Subject<number> = new Subject<number>();
+
+  private analyserNODES_Observable: Subject<WeakMap<HTMLAudioElement, AnalyserNode>>
+    = new Subject<WeakMap<HTMLAudioElement, AnalyserNode>>();
+  private contextNODES_Observable: Subject<WeakMap<HTMLAudioElement, MediaElementAudioSourceNode>>
+    = new Subject<WeakMap<HTMLAudioElement, MediaElementAudioSourceNode>>();
 
   constructor(private _fileService: FileService,
               private _databaseService: DatabaseService,
@@ -48,7 +54,16 @@ export class PlayerService {
     this.audio = new Audio();
     this.audio.volume = 0.15;
     this.audioContext = new AudioContext();
+
+    this.mediaElementAudioSourceNode = this.audioContext.createMediaElementSource(this.audio);
     this.audioContextAnalyserNode = this.audioContext.createAnalyser();
+
+    this.mediaElementAudioSourceNode.connect(this.audioContextAnalyserNode);
+    this.audioContextAnalyserNode.connect(this.audioContext.destination);
+
+    this.contextNODES.set(this.audio, this.mediaElementAudioSourceNode);
+    this.analyserNODES.set(this.audio, this.audioContextAnalyserNode);
+
     this.ipcRendererSelectedFiles();
     this.attachListeners();
   }
@@ -77,8 +92,12 @@ export class PlayerService {
     return this.elapsedTimeObservable.asObservable();
   }
 
-  public get_MEDIA_ELEMENT_NODES_Observable(): Observable<WeakMap<HTMLAudioElement, AnalyserNode>> {
-    return this.ANALYSER_NODES_Observable.asObservable();
+  public getAnalyserNODESObservable(): Observable<WeakMap<HTMLAudioElement, AnalyserNode>> {
+    return this.analyserNODES_Observable.asObservable();
+  }
+
+  public getContextNODESObservable(): Observable<WeakMap<HTMLAudioElement, MediaElementAudioSourceNode>> {
+    return this.contextNODES_Observable.asObservable();
   }
 
   public updateSongSubscription() {
@@ -93,8 +112,12 @@ export class PlayerService {
     this.audioObservable.next(this.audio);
   }
 
-  public update_ANALYSER_NODES_Subscription() {
-    this.ANALYSER_NODES_Observable.next(this.ANALYSER_NODES);
+  public updateAnalyserNODESSubscription() {
+    this.analyserNODES_Observable.next(this.analyserNODES);
+  }
+
+  public updateContextNODESSubscription() {
+    this.contextNODES_Observable.next(this.contextNODES);
   }
 
   public playerTogglePlayPause() {
@@ -110,7 +133,7 @@ export class PlayerService {
     }
     this.songObservable.next(this.song);
     this.audioObservable.next(this.audio);
-    this.ANALYSER_NODES_Observable.next(this.ANALYSER_NODES);
+    this.analyserNODES_Observable.next(this.analyserNODES);
 
     return this.audio.paused;
   }
@@ -120,14 +143,14 @@ export class PlayerService {
       this.iterator = this.songList.length;
     }
     this.iterator--;
-    let song: Song = this.songList[ this.iterator ];
+    let song: Song = this.songList[this.iterator];
     this.setPlayer(song);
   }
 
   public setNextSong() {
     this.iterator++;
     this.iterator = this.iterator % this.songList.length;
-    let song: Song = this.songList[ this.iterator ];
+    let song: Song = this.songList[this.iterator];
     this.setPlayer(song);
   }
 
@@ -137,17 +160,19 @@ export class PlayerService {
     this.audio.src = './assets/08 - Gibu.mp3';
     this.audio.load();
 
-    if (this.ANALYSER_NODES.has(this.audio)) {
-      this.audioContextAnalyserNode = this.ANALYSER_NODES.get(this.audio);
+    if (this.analyserNODES.has(this.audio)) {
+      this.mediaElementAudioSourceNode = this.contextNODES.get(this.audio);
+      this.audioContextAnalyserNode = this.analyserNODES.get(this.audio);
     } else {
       this.audioContext = new AudioContext();
+      this.mediaElementAudioSourceNode = this.audioContext.createMediaElementSource(this.audio);
       this.audioContextAnalyserNode = this.audioContext.createAnalyser();
 
-      this.sourceMediaElementContextAudio = this.audioContext.createMediaElementSource(this.audio);
-      this.sourceMediaElementContextAudio.connect(this.audioContextAnalyserNode);
+      this.mediaElementAudioSourceNode.connect(this.audioContextAnalyserNode);
       this.audioContextAnalyserNode.connect(this.audioContext.destination);
 
-      this.ANALYSER_NODES.set(this.audio, this.audioContextAnalyserNode);
+      this.analyserNODES.set(this.audio, this.audioContextAnalyserNode);
+      this.contextNODES.set(this.audio, this.mediaElementAudioSourceNode);
     }
   }
 
@@ -235,7 +260,8 @@ export class PlayerService {
 
   public getData(): InterfaceDataPlayer {
     return {
-      'ANALYSER_NODES': this.ANALYSER_NODES,
+      'analyserNODES': this.analyserNODES,
+      'contextNODES': this.contextNODES,
       'audio': this.audio,
       'song': this.song,
       'songList': this.songList,
@@ -254,7 +280,7 @@ export class PlayerService {
     });
 
     for (let index in differenceMusicFiles) {
-      let pathFile: string = differenceMusicFiles[ index ];
+      let pathFile: string = differenceMusicFiles[index];
       this._fileService.loadAudioMetaDataFromPath(pathFile).then(
         (audioMetadataValue: IAudioMetadata) => {
 
@@ -267,7 +293,7 @@ export class PlayerService {
             audioMetadata: audioMetadataValue
           });
           if (audioMetadataValue.common.picture !== undefined) {
-            let picture = audioMetadataValue.common.picture[ 0 ];
+            let picture = audioMetadataValue.common.picture[0];
             if (picture !== undefined) {
               newSong.imgData = 'data:' + picture.format + ';base64,' + picture.data.toString('base64');
             }
@@ -295,7 +321,7 @@ export class PlayerService {
       this._electronService.ipcRenderer.on('selected-files', (event, args) => {
         console.log('es esto un evento?');
         if (args.musicFiles.length > 0) {
-          let arrayMusicFiles: string[] = [ ...args.musicFiles ];
+          let arrayMusicFiles: string[] = [...args.musicFiles];
           this.initPlayerFromMusicFiles(arrayMusicFiles);
         }
       });
