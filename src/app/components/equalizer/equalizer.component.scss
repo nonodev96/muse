@@ -1,0 +1,48 @@
+.equalizer {
+  margin: 1em;
+  display: grid;
+
+  .section {
+    display: inline-grid;
+    grid-template-columns: 1fr 2fr;
+    justify-items: center;
+    align-items: center;
+
+    .title {
+      grid-column-start: 1;
+    }
+
+    .sliders {
+      grid-column-start: 2;
+      width: 100%;
+
+      .range-slider {
+        display: grid;
+        grid-template-columns: 1fr 3fr 1fr 1fr;
+        justify-items: center;
+        align-items: center;
+
+        .scope {
+          grid-column-start: 1;
+        }
+
+        .mat-slider-eq {
+          grid-column-start: 2;
+          width: 100%;
+        }
+
+        .scope-min {
+          grid-column-start: 3;
+          justify-self: center;
+        }
+
+        .param {
+          grid-column-start: 4;
+          justify-self: stretch;
+        }
+      }
+    }
+
+
+  }
+}

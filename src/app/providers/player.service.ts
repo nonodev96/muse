@@ -157,7 +157,7 @@ export class PlayerService {
   public setPlayer(song: Song) {
     this.setSong(song);
     // this.audio.src = song.src;
-    this.audio.src = './assets/08 - Gibu.mp3';
+    this.audio.src = './assets/02. Copacabana.mp3';
     this.audio.load();
 
     if (this.analyserNODES.has(this.audio)) {
@@ -325,6 +325,11 @@ export class PlayerService {
           this.initPlayerFromMusicFiles(arrayMusicFiles);
         }
       });
+
+      this._electronService.ipcRenderer.on('media-controls', (event, args) => {
+        console.log(event, args);
+      });
+
 
     });
   }

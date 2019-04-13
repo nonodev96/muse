@@ -1,9 +1,12 @@
-import { app, dialog, BrowserWindow, screen, Menu } from 'electron';
+import {app, dialog, BrowserWindow, screen, Menu} from 'electron';
+import {TouchBar, NativeImage, nativeImage, TouchBarConstructorOptions} from 'electron';
 import * as path from 'path';
 import * as url from 'url';
 
-const fs = require('fs');
+const {TouchBarLabel, TouchBarButton, TouchBarSpacer} = TouchBar;
 
+
+const fs = require('fs');
 const args = process.argv.slice(1);
 let win;
 let serve = args.some(val => val === '--serve');
@@ -23,21 +26,171 @@ function createWindow() {
     icon: path.join(__dirname, 'src/assets/icons/512x512.png')
   });
 
-  let menu = Menu.buildFromTemplate([
+  let template: any = [
     {
-      label: 'Cargar Música',
-      accelerator: 'CommandOrControl+o',
-      click: function () {
-        openFolderDialog();
-      }
+      label: 'Edit',
+      submenu: [
+        {
+          role: 'undo'
+        }, {
+          role: 'redo'
+        }, {
+          type: 'separator'
+        }, {
+          role: 'cut'
+        }, {
+          role: 'copy'
+        }, {
+          role: 'paste'
+        }, {
+          role: 'pasteandmatchstyle'
+        }, {
+          role: 'delete'
+        }, {
+          role: 'selectall'
+        }
+      ]
     },
     {
-      label: 'Dev Tools',
-      click: function () {
-        win.webContents.openDevTools();
-      }
+      label: 'Cargar',
+      submenu: [
+        {
+          label: 'Cargar Música',
+          accelerator: 'CommandOrControl+L',
+          click() {
+            openFolderDialog();
+          }
+        }, {
+          label: 'touch bar',
+          click() {
+
+          }
+        }
+      ]
+    },
+    {
+      label: 'View',
+      submenu: [
+        {
+          label: 'Reload',
+          accelerator: 'CmdOrCtrl+R',
+          click(item, focusedWindow) {
+            if (focusedWindow) {
+              focusedWindow.reload();
+            }
+          }
+        }, {
+          label: 'Toggle Developer Tools',
+          accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
+          click(item, focusedWindow) {
+            if (focusedWindow) {
+              focusedWindow.webContents.toggleDevTools();
+            }
+          }
+        }, {
+          type: 'separator'
+        }, {
+          role: 'resetzoom'
+        }, {
+          role: 'zoomin'
+        }, {
+          role: 'zoomout'
+        }, {
+          type: 'separator'
+        }, {
+          role: 'togglefullscreen'
+        }
+      ]
+    },
+    {
+      role: 'window',
+      submenu: [
+        {
+          role: 'minimize'
+        }, {
+          role: 'close'
+        }
+      ]
+    },
+    {
+      role: 'help',
+      submenu: [
+        {
+          label: 'Learn More',
+          click() {
+            require('electron').shell.openExternal('http://electron.atom.io');
+          }
+        }
+      ]
     }
-  ]);
+  ];
+
+  if (process.platform === 'darwin') {
+    const name = app.getName();
+    template.unshift({
+      label: name,
+      submenu: [
+        {
+          role: 'about'
+        }, {
+          type: 'separator'
+        }, {
+          role: 'services',
+        }, {
+          type: 'separator'
+        }, {
+          role: 'hide'
+        }, {
+          role: 'hideothers'
+        }, {
+          role: 'unhide'
+        }, {
+          type: 'separator'
+        }, {
+          role: 'quit'
+        }
+      ]
+    });
+
+    // Edit menu.
+    template[1].submenu.push(
+      {
+        type: 'separator'
+      }, {
+        label: 'Speech',
+        submenu: [
+          {
+            role: 'startspeaking'
+          }, {
+            role: 'stopspeaking'
+          }
+        ]
+      }
+    );
+
+    // Window menu.
+    template[3].submenu = [
+      {
+        label: 'Close',
+        accelerator: 'CmdOrCtrl+W',
+        role: 'close'
+      }, {
+        label: 'Minimize',
+        accelerator: 'CmdOrCtrl+M',
+        role: 'minimize'
+      }, {
+        label: 'Zoom',
+        role: 'zoom'
+      }, {
+        type: 'separator'
+      }, {
+        label: 'Bring All to Front',
+        role: 'front'
+      }
+    ];
+  }
+
+  const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);
 
   function openFolderDialog() {
@@ -45,32 +198,30 @@ function createWindow() {
       filters: [
         {
           name: 'Music',
-          extensions: [ 'mp3', 'm4a', 'webm', 'wav', 'aac', 'ogg', 'opus' ]
+          extensions: ['mp3', 'm4a', 'webm', 'wav', 'aac', 'ogg', 'opus']
         }
       ],
-      properties: [ 'openFile', 'multiSelections' ]
+      properties: ['openFile', 'multiSelections']
     }, function (musicFiles) {
-      console.log(musicFiles);
       if (musicFiles) {
-        win.webContents.send('selected-files', { musicFiles });
-        //   scanDir(filePath);
+        win.webContents.send('selected-files', {musicFiles});
       }
     });
   }
 
   function scanDir(filePath) {
-    if (!filePath || filePath[ 0 ] === 'undefined') {
+    if (!filePath || filePath[0] === 'undefined') {
       return;
     }
 
-    fs.readdir(filePath[ 0 ], function (err, files) {
+    fs.readdir(filePath[0], function (err, files) {
       let arr = [];
       for (let i = 0; i < files.length; i++) {
-        if (files[ i ].substr(-4) === '.mp3' || files[ i ].substr(-4) === '.m4a'
-          || files[ i ].substr(-5) === '.webm' || files[ i ].substr(-4) === '.wav'
-          || files[ i ].substr(-4) === '.aac' || files[ i ].substr(-4) === '.ogg'
-          || files[ i ].substr(-5) === '.opus') {
-          arr.push(files[ i ]);
+        if (files[i].substr(-4) === '.mp3' || files[i].substr(-4) === '.m4a'
+          || files[i].substr(-5) === '.webm' || files[i].substr(-4) === '.wav'
+          || files[i].substr(-4) === '.aac' || files[i].substr(-4) === '.ogg'
+          || files[i].substr(-5) === '.opus') {
+          arr.push(files[i]);
         }
       }
       // console.log(filePath);
@@ -117,7 +268,54 @@ try {
   // This method will be called when Electron has finished
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
-  app.on('ready', createWindow);
+  app.on('ready', () => {
+    createWindow();
+    if (process.platform === 'darwin') {
+
+      const iconPlayPause = nativeImage.createFromNamedImage('NSTouchBarPlayPauseTemplate', [-1, 0, 1]);
+      const iconNext = nativeImage.createFromNamedImage('NSTouchBarSkipToEndTemplate', [-1, 0, 1]);
+      const iconPrevious = nativeImage.createFromNamedImage('NSTouchBarSkipToStartTemplate', [-1, 0, 1]);
+
+      let next = new TouchBarButton({
+        icon: iconNext,
+        click: () => {
+          win.webContents.send('media-controls', {
+            status: 'next'
+          });
+        },
+      });
+
+      let previous = new TouchBarButton({
+        icon: iconPrevious,
+        click: () => {
+          win.webContents.send('media-controls', {
+            status: 'previous'
+          });
+        },
+      });
+
+      let playPause = new TouchBarButton({
+        icon: iconPlayPause,
+        click: () => {
+          win.webContents.send('media-controls', {
+            status: 'playPause'
+          });
+        },
+      });
+
+      let info = new TouchBarLabel({
+        label: 'Muse uJaén',
+        textColor: '#ffd51f'
+      });
+
+      let options: TouchBarConstructorOptions = {
+        items: [previous, playPause, next, info]
+      };
+
+      let touchBar = new TouchBar(options);
+      win.setTouchBar(touchBar);
+    }
+  });
 
   // Quit when all windows are closed.
   app.on('window-all-closed', () => {

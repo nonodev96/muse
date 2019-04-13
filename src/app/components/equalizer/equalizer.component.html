@@ -1,81 +1,194 @@
-<div class="equalizer">
-  <div class="section">
-    <div class="title">HF</div>
+<mat-card class="equalizer">
+  <!--
+    <script>
+      let sections = [
+        {
+          title: 'HF',
+          slider: [{
+            min: 4700,
+            max: 22000,
+            step: 100,
+            value: highShelf.frequency.value,
+            data_filter: 'highShelf',
+            data_param: 'frequency',
+            scope_min: '22',
+            scope_max: '4.7',
+            param: 'kHz'
+          }, {
+            min: -50,
+            max: 50,
+            step: 1,
+            value: highPass.gain.value,
+            data_filter: 'highShelf',
+            data_param: 'gain',
+            scope_min: '-50',
+            scope_max: '50',
+            param: 'dB'
+          }]
+        }, {
+          title: 'LF',
+          slider: [{
+            min: 35,
+            max: 220,
+            step: 1,
+            value: lowShelf.frequency.value,
+            data_filter: 'lowShelf',
+            data_param: 'frequency',
+            scope_min: '35',
+            scope_max: '220',
+            param: 'Hz'
+          }, {
+            min: -50,
+            max: 50,
+            step: 1,
+            value: lowShelf.gain.value,
+            data_filter: 'highShelf',
+            data_param: 'gain',
+            scope_min: '-50',
+            scope_max: '50',
+            param: 'dB'
+          }]
+        }, {
+          title: 'HMF',
+          slider: [{
+            min: 800,
+            max: 5900,
+            step: 1,
+            value: highPass.frequency.value,
+            data_filter: 'lowShelf',
+            data_param: 'frequency',
+            scope_min: '0.8',
+            scope_max: '.9',
+            param: 'KHz'
+          }, {
+            min: 0.7,
+            max: 12,
+            step: 0.1,
+            value: highPass.Q.value,
+            data_filter: 'highShelf',
+            data_param: 'Q',
+            scope_min: '0.7',
+            scope_max: '12',
+            param: 'Q'
+          }]
+        }, {
+          title: 'LMF',
+          slider: [{
+            min: 80,
+            max: 1600,
+            step: 10,
+            value: lowPass.frequency.value,
+            data_filter: 'lowShelf',
+            data_param: 'frequency',
+            scope_min: '80',
+            scope_max: '1600',
+            param: 'KHz'
+          }, {
+            min: 0.7,
+            max: 12,
+            step: 0.1,
+            value: lowPass.Q.value,
+            data_filter: 'lowPass',
+            data_param: 'Q',
+            scope_min: '0.7',
+            scope_max: '12',
+            param: 'Q'
+          }]
+        },
+      ]
+    </script>
+    <div class="section">
+      <div class="title">HF</div>
+      <div class="sliders">
+        <div class="range-slider">
+          <span class="scope">22</span>
+          <input type="range" min="4700" max="22000" step="100" value="{{highShelf.frequency.value}}"
+                 data-filter="highShelf" data-param="frequency">
+          <span class="scope scope-min">4.7</span>
+          <span class="param">kHz</span>
+        </div>
+        <div class="range-slider">
+          <span class="scope">50</span>
+          <input type="range" min="-50" max="50" value="{{highPass.gain.value}}" data-filter="highShelf"
+                 data-param="gain">
+          <span class="scope scope-min">-50</span>
+          <span class="param">dB</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="title">LF</div>
+      <div class="sliders">
+        <div class="range-slider">
+          <span class="scope">220</span>
+          <input type="range" min="35" max="220" step="1" value="{{lowShelf.frequency.value}}" data-filter="lowShelf"
+                 data-param="frequency">
+          <span class="scope scope-min">35</span>
+          <span class="param">Hz</span>
+        </div>
+        <div class="range-slider">
+          <span class="scope">50</span>
+          <input type="range" min="-50" max="50" value="{{lowShelf.gain.value}}" data-filter="lowShelf" data-param="gain">
+          <span class="scope scope-min">-50</span>
+          <span class="param">dB</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="title">HMF</div>
+      <div class="sliders">
+        <div class="range-slider">
+          <span class="scope">5.9</span>
+          <input type="range" min="800" max="5900" step="100" value="{{highPass.frequency.value}}" data-filter="highPass"
+                 data-param="frequency">
+          <span class="scope scope-min">0.8</span>
+          <span class="param">kHz</span>
+        </div>
+        <div class="range-slider">
+          <span class="scope">12</span>
+          <input type="range" min="0.7" max="12" step="0.1" value="{{highPass.Q.value}}" data-filter="highPass"
+                 data-param="Q">
+          <span class="scope scope-min">0.7</span>
+          <span class="param">Q</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="title">LMF</div>
+      <div class="sliders">
+        <div class="range-slider">
+          <span class="scope">1600</span>
+          <input type="range" min="80" max="1600" step="10" value="{{lowPass.frequency.value}}" data-filter="lowPass"
+                 data-param="frequency">
+          <span class="scope scope-min">80</span>
+          <span class="param">Hz</span>
+        </div>
+        <div class="range-slider">
+          <span class="scope">12</span>
+          <input type="range" min="0.7" max="12" step="0.1" value="{{lowPass.Q.value}}" data-filter="lowPass"
+                 data-param="Q">
+          <span class="scope scope-min">0.7</span>
+          <span class="param">Q</span>
+        </div>
+      </div>data-filter="{{slider.data_filter}}" data-param="{{slider.data_param}}"
+    </div>
+  -->
+  <div class="section" *ngFor="let section of sections.data">
+    <div class="title">{{section.title}}</div>
     <div class="sliders">
-      <div class="range-slider">
-        <span class="scope">22</span>
-        <input type="range" min="4700" max="22000" step="100" value="{{highShelf.frequency.value}}"
-               data-filter="highShelf" data-param="frequency">
-        <span class="scope scope-min">4.7</span>
-        <span class="param">kHz</span>
+
+      <div class="range-slider" *ngFor="let slider of section.slider">
+        <span class="scope">{{slider.scope_max}}</span>
+        <mat-slider class="mat-slider-eq" min="{{slider.min}}" max="{{slider.max}}" step="{{slider.step}}"
+                    value="{{slider.value}}"></mat-slider>
+        <span class="scope scope-min">{{slider.scope_min}}</span>
+        <span class="param">{{slider.param}}</span>
       </div>
-      <div class="range-slider">
-        <span class="scope">50</span>
-        <input type="range" min="-50" max="50" value="{{highPass.gain.value}}" data-filter="highShelf"
-               data-param="gain">
-        <span class="scope scope-min">-50</span>
-        <span class="param">dB</span>
-      </div>
+
     </div>
   </div>
 
-  <div class="section">
-    <div class="title">LF</div>
-    <div class="sliders">
-      <div class="range-slider">
-        <span class="scope">220</span>
-        <input type="range" min="35" max="220" step="1" value="{{lowShelf.frequency.value}}" data-filter="lowShelf"
-               data-param="frequency">
-        <span class="scope scope-min">35</span>
-        <span class="param">Hz</span>
-      </div>
-      <div class="range-slider">
-        <span class="scope">50</span>
-        <input type="range" min="-50" max="50" value="{{lowShelf.gain.value}}" data-filter="lowShelf" data-param="gain">
-        <span class="scope scope-min">-50</span>
-        <span class="param">dB</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="title">HMF</div>
-    <div class="sliders">
-      <div class="range-slider">
-        <span class="scope">5.9</span>
-        <input type="range" min="800" max="5900" step="100" value="{{highPass.frequency.value}}" data-filter="highPass"
-               data-param="frequency">
-        <span class="scope scope-min">0.8</span>
-        <span class="param">kHz</span>
-      </div>
-      <div class="range-slider">
-        <span class="scope">12</span>
-        <input type="range" min="0.7" max="12" step="0.1" value="{{highPass.Q.value}}" data-filter="highPass"
-               data-param="Q">
-        <span class="scope scope-min">0.7</span>
-        <span class="param">Q</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="title">LMF</div>
-    <div class="sliders">
-      <div class="range-slider">
-        <span class="scope">1600</span>
-        <input type="range" min="80" max="1600" step="10" value="{{lowPass.frequency.value}}" data-filter="lowPass"
-               data-param="frequency">
-        <span class="scope scope-min">80</span>
-        <span class="param">Hz</span>
-      </div>
-      <div class="range-slider">
-        <span class="scope">12</span>
-        <input type="range" min="0.7" max="12" step="0.1" value="{{lowPass.Q.value}}" data-filter="lowPass"
-               data-param="Q">
-        <span class="scope scope-min">0.7</span>
-        <span class="param">Q</span>
-      </div>
-    </div>
-  </div>
-
-</div>
+</mat-card>

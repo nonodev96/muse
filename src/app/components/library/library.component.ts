@@ -38,7 +38,7 @@ export class LibraryComponent implements OnInit {
       this.dataSource.filter = JSON.stringify(this.filterValues);
     });
     this.albumFilter.valueChanges.subscribe(value => {
-      this.filterValues.artist = value;
+      this.filterValues.album = value;
       this.dataSource.filter = JSON.stringify(this.filterValues);
     });
     this.artistFilter.valueChanges.subscribe(value => {
