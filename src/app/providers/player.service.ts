@@ -4,7 +4,7 @@ import {Song} from '../mocks/Song';
 import {FileService} from './file.service';
 import {IAudioMetadata} from 'music-metadata/lib/type';
 import {ElectronService} from './electron.service';
-import {DataBase, DatabaseService, InterfacePlayList} from './database.service';
+import {EnumDataBase, DatabaseService, InterfacePlayList} from './database.service';
 import {Utils} from '../utils/utils';
 
 
@@ -52,7 +52,7 @@ export class PlayerService {
   ) {
     this.song = new Song();
     this.audio = new Audio();
-    this.audio.volume = 0.15;
+    this.audio.volume = 0.5;
     this.audioContext = new AudioContext();
 
     this.mediaElementAudioSourceNode = this.audioContext.createMediaElementSource(this.audio);
@@ -156,9 +156,13 @@ export class PlayerService {
 
   public setPlayer(song: Song) {
     this.setSong(song);
-    // this.audio.src = song.src;
-    this.audio.src = './assets/02. Copacabana.mp3';
-    this.audio.load();
+
+    if (this._electronService.isElectron()) {
+      this.audio.src = 'file:///' + song.src;
+    } else {
+      this.audio.src = './assets/02. Copacabana.mp3';
+    }
+    // this.audio.srcOb
 
     if (this.analyserNODES.has(this.audio)) {
       this.mediaElementAudioSourceNode = this.contextNODES.get(this.audio);
@@ -273,7 +277,7 @@ export class PlayerService {
     let differenceMusicFiles: string[] = <string[]>Array.from(Utils.setDifference(new Set(musicFiles), new Set(this.musicFiles)));
     this.musicFiles = <string[]>Array.from(Utils.setUnion(new Set(this.musicFiles), new Set(musicFiles)));
     // console.log(differenceMusicFiles);
-    this._databaseService.addSongsPathToPlayList(DataBase.songsLoad, differenceMusicFiles).then(value => {
+    this._databaseService.addSongsPathToPlayList(EnumDataBase.songsLoad, differenceMusicFiles).then(value => {
 
       // console.log(value);
 
@@ -310,7 +314,7 @@ export class PlayerService {
    * Electron tunel
    */
   private ipcRendererSelectedFiles() {
-    this._databaseService.getPlayListsByName(DataBase.songsLoad).then((songsLoad: InterfacePlayList) => {
+    this._databaseService.getPlayListsByName(EnumDataBase.songsLoad).then((songsLoad: InterfacePlayList) => {
       // console.log(songsLoad);
       if (songsLoad.paths.length > 0) {
         this.initPlayerFromMusicFiles(songsLoad.paths);
@@ -327,7 +331,21 @@ export class PlayerService {
       });
 
       this._electronService.ipcRenderer.on('media-controls', (event, args) => {
-        console.log(event, args);
+        console.log(args);
+        switch (args.status) {
+          case 'next':
+            this.setNextSong();
+            this.playerTogglePlayPause();
+            break;
+          case 'previous':
+            this.setPreviousSong();
+            this.playerTogglePlayPause();
+            break;
+          case 'playPause':
+            this.playerTogglePlayPause();
+            break;
+        }
+
       });
 
 

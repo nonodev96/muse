@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import storage from 'electron-json-storage';
 
-export enum DataBase {
+export enum EnumDataBase {
   favorites = 'favorites',
   playLists = 'playLists',
   // Protected playList
@@ -29,6 +29,18 @@ export interface InterfaceFavoriteToAdd {
   path: string;
 }
 
+export enum EnumAddFavorites {
+  THE_SONG_HAS_BEEN_ADDED = 1,
+  THE_SONG_HAS_NOT_BEEN_ADDED = 2,
+  THE_SONG_IS_ALREADY_IN_THE_LIST = 3
+}
+
+export enum EnumDeleteFavorites {
+  THE_SONG_HAS_BEEN_DELETE = 1,
+  THE_SONG_HAS_NOT_BEEN_DELETE = 2,
+  THE_SONG_IS_NOT_IN_FAVORITES = 3
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -40,10 +52,10 @@ export class DatabaseService {
     this.initDataBase();
   }
 
-  public addFavorite(songPathToAdd: InterfaceFavoriteToAdd): Promise<string | boolean> {
+  public addFavorite(songPathToAdd: InterfaceFavoriteToAdd): Promise<EnumAddFavorites> {
     return new Promise((resolve) => {
       let dataBaseJsonPath = this.dataBaseJsonPath;
-      storage.get(DataBase.favorites, dataBaseJsonPath, (errorGET, dataJSON_Favorites: InterfaceFavorites) => {
+      storage.get(EnumDataBase.favorites, dataBaseJsonPath, (errorGET, dataJSON_Favorites: InterfaceFavorites) => {
         let valueToAdd = songPathToAdd.path;
 
         // If not exist, add to the list and update
@@ -53,31 +65,30 @@ export class DatabaseService {
           let updateFavorites: InterfaceFavorites = {
             paths: dataJSON_Favorites.paths
           };
-          storage.set(DataBase.favorites, updateFavorites, dataBaseJsonPath, (error_SET) => {
+          storage.set(EnumDataBase.favorites, updateFavorites, dataBaseJsonPath, (error_SET) => {
             if (error_SET !== undefined) {
               console.log('error_SET' + error_SET);
-              resolve(false);
+              resolve(EnumAddFavorites.THE_SONG_HAS_NOT_BEEN_ADDED);
             } else {
-              resolve(true);
+              resolve(EnumAddFavorites.THE_SONG_HAS_BEEN_ADDED);
             }
           });
         } else {
-          resolve('La canción ' + songPathToAdd.path + ' ya existe en la lista de favoritos');
+          resolve(EnumAddFavorites.THE_SONG_IS_ALREADY_IN_THE_LIST);
         }
-
       });
     });
   }
 
-  public deleteFavorite(songPathToDelete: InterfaceFavoriteToDelete): Promise<string | boolean> {
+  public deleteFavorite(songPathToDelete: InterfaceFavoriteToDelete): Promise<EnumDeleteFavorites> {
     return new Promise((resolve) => {
       let dataBaseJsonPath = this.dataBaseJsonPath;
-      storage.get(DataBase.favorites, dataBaseJsonPath, (error_GET, dataJSON_Favorites: InterfaceFavorites) => {
+      storage.get(EnumDataBase.favorites, dataBaseJsonPath, (error_GET, dataJSON_Favorites: InterfaceFavorites) => {
 
         // to remove from the array
         let valueToRemove = songPathToDelete.path;
         if (dataJSON_Favorites.paths.indexOf(valueToRemove) === -1) {
-          resolve('La canción ' + songPathToDelete.path + ' no existe en la lista de favoritos');
+          resolve(EnumDeleteFavorites.THE_SONG_IS_NOT_IN_FAVORITES);
         }
         dataJSON_Favorites.paths = dataJSON_Favorites.paths.filter(element => element !== valueToRemove);
 
@@ -87,12 +98,12 @@ export class DatabaseService {
         let updateFavorites: InterfaceFavorites = {
           paths: dataJSON_Favorites.paths
         };
-        storage.set(DataBase.favorites, updateFavorites, dataBaseJsonPath, (error_SET) => {
+        storage.set(EnumDataBase.favorites, updateFavorites, dataBaseJsonPath, (error_SET) => {
           if (error_SET !== undefined) {
             console.log('error_SET' + error_SET);
-            resolve(false);
+            resolve(EnumDeleteFavorites.THE_SONG_HAS_NOT_BEEN_DELETE);
           } else {
-            resolve(true);
+            resolve(EnumDeleteFavorites.THE_SONG_HAS_BEEN_DELETE);
           }
         });
 
@@ -102,7 +113,7 @@ export class DatabaseService {
 
   public getAllFavorites(): Promise<InterfaceFavorites> {
     return new Promise((resolve) => {
-      storage.get(DataBase.favorites, this.dataBaseJsonPath, (error_GET, dataJSON_Favorites: InterfaceFavorites) => {
+      storage.get(EnumDataBase.favorites, this.dataBaseJsonPath, (error_GET, dataJSON_Favorites: InterfaceFavorites) => {
         resolve(dataJSON_Favorites);
         console.log(error_GET);
       });
@@ -113,8 +124,8 @@ export class DatabaseService {
     let dataBaseJsonPath = this.dataBaseJsonPath;
 
     return new Promise((resolve) => {
-      if (DataBase.songsLoad !== namePlaylistToCreate) {
-        storage.get(DataBase.playLists, dataBaseJsonPath, (error_GET, dataJSON_PlayLists: InterfacePlayLists) => {
+      if (EnumDataBase.songsLoad !== namePlaylistToCreate) {
+        storage.get(EnumDataBase.playLists, dataBaseJsonPath, (error_GET, dataJSON_PlayLists: InterfacePlayLists) => {
 
           // find playlist in the list of playLists
           let search = dataJSON_PlayLists.playLists.find(playlist => {
@@ -128,7 +139,7 @@ export class DatabaseService {
               paths: []
             };
             dataJSON_PlayLists.playLists.push(initNewPlaylist);
-            storage.set(DataBase.playLists, dataJSON_PlayLists, dataBaseJsonPath, (error_SET) => {
+            storage.set(EnumDataBase.playLists, dataJSON_PlayLists, dataBaseJsonPath, (error_SET) => {
               if (error_SET !== undefined) {
                 console.log('error_SET' + error_SET);
                 resolve(false);
@@ -151,8 +162,8 @@ export class DatabaseService {
     let dataBaseJsonPath = this.dataBaseJsonPath;
 
     return new Promise((resolve) => {
-      if (DataBase.songsLoad !== namePlaylistToDelete) {
-        storage.get(DataBase.playLists, dataBaseJsonPath, (error_GET, dataJSON_PlayLists: InterfacePlayLists) => {
+      if (EnumDataBase.songsLoad !== namePlaylistToDelete) {
+        storage.get(EnumDataBase.playLists, dataBaseJsonPath, (error_GET, dataJSON_PlayLists: InterfacePlayLists) => {
 
           // find playlist in the list of playlists
           let search = dataJSON_PlayLists.playLists.find(playlist => {
@@ -165,7 +176,7 @@ export class DatabaseService {
               return playlist.name !== namePlaylistToDelete;
             });
 
-            storage.set(DataBase.playLists, dataJSON_PlayLists, dataBaseJsonPath, (error_SET) => {
+            storage.set(EnumDataBase.playLists, dataJSON_PlayLists, dataBaseJsonPath, (error_SET) => {
               if (error_SET !== undefined) {
                 console.log('error_SET' + error_SET);
                 resolve(false);
@@ -188,7 +199,7 @@ export class DatabaseService {
     let dataBaseJsonPath = this.dataBaseJsonPath;
 
     return new Promise((resolve) => {
-      storage.get(DataBase.playLists, dataBaseJsonPath, (error_GET, dataJSON_PlayLists: InterfacePlayLists) => {
+      storage.get(EnumDataBase.playLists, dataBaseJsonPath, (error_GET, dataJSON_PlayLists: InterfacePlayLists) => {
 
         let searchPlayList = dataJSON_PlayLists.playLists.find(playList => {
           return playList.name === namePlayList;
@@ -209,7 +220,7 @@ export class DatabaseService {
                 // Add to playList
                 playlist.paths.push(songPathToPlayList);
 
-                storage.set(DataBase.playLists, dataJSON_PlayLists, dataBaseJsonPath, (error_SET) => {
+                storage.set(EnumDataBase.playLists, dataJSON_PlayLists, dataBaseJsonPath, (error_SET) => {
                   if (error_SET !== undefined) {
                     console.log('error_SET' + error_SET);
                     resolve(false);
@@ -236,7 +247,7 @@ export class DatabaseService {
     let dataBaseJsonPath = this.dataBaseJsonPath;
 
     return new Promise((resolve) => {
-      storage.get(DataBase.playLists, dataBaseJsonPath, (error_GET, dataJSON_PlayLists: InterfacePlayLists) => {
+      storage.get(EnumDataBase.playLists, dataBaseJsonPath, (error_GET, dataJSON_PlayLists: InterfacePlayLists) => {
 
         let searchPlayList = dataJSON_PlayLists.playLists.find(playList => {
           return playList.name === namePlayList;
@@ -257,7 +268,7 @@ export class DatabaseService {
                 return playlist.paths.indexOf(item) === pos;
               });
 
-              storage.set(DataBase.playLists, dataJSON_PlayLists, dataBaseJsonPath, (error_SET) => {
+              storage.set(EnumDataBase.playLists, dataJSON_PlayLists, dataBaseJsonPath, (error_SET) => {
                 if (error_SET === undefined) {
                   resolve(true);
                 } else {
@@ -278,7 +289,7 @@ export class DatabaseService {
 
   public getPlayListsByName(playListName: string): Promise<InterfacePlayList | string> {
     return new Promise((resolve) => {
-      storage.get(DataBase.playLists, this.dataBaseJsonPath, (error_GET, dataJSON_PlayLists: InterfacePlayLists) => {
+      storage.get(EnumDataBase.playLists, this.dataBaseJsonPath, (error_GET, dataJSON_PlayLists: InterfacePlayLists) => {
 
         if (dataJSON_PlayLists.playLists !== undefined) {
 
@@ -290,7 +301,7 @@ export class DatabaseService {
             resolve(searchPlayList);
           } else {
             let defaultPlayList: InterfacePlayList = {
-              name: DataBase.songsLoad,
+              name: EnumDataBase.songsLoad,
               paths: []
             };
             console.log('defaultPlayList');
@@ -299,7 +310,7 @@ export class DatabaseService {
 
         } else {
           let defaultPlayList: InterfacePlayList = {
-            name: DataBase.songsLoad,
+            name: EnumDataBase.songsLoad,
             paths: []
           };
           console.log('defaultPlayList');
@@ -312,7 +323,7 @@ export class DatabaseService {
 
   public getAllPlayLists(): Promise<InterfacePlayLists> {
     return new Promise((resolve) => {
-      storage.get(DataBase.playLists, this.dataBaseJsonPath, function (error_GET, dataJSON_PlayLists: InterfacePlayLists) {
+      storage.get(EnumDataBase.playLists, this.dataBaseJsonPath, function (error_GET, dataJSON_PlayLists: InterfacePlayLists) {
         if (error_GET !== undefined) {
           console.log('error_GET ' + error_GET);
         }
@@ -340,25 +351,25 @@ export class DatabaseService {
       } else {
         let dataBaseJsonPath = storage.getDataPath();
 
-        if (tables.indexOf(DataBase.favorites) === -1) {
+        if (tables.indexOf(EnumDataBase.favorites) === -1) {
           let initFavorites: InterfaceFavorites = {
             paths: []
           };
-          storage.set(DataBase.favorites, initFavorites, dataBaseJsonPath, (error_INIT) => {
+          storage.set(EnumDataBase.favorites, initFavorites, dataBaseJsonPath, (error_INIT) => {
             if (error_INIT !== undefined) {
               console.log(error_INIT);
             }
           });
         }
 
-        if (tables.indexOf(DataBase.playLists) === -1) {
+        if (tables.indexOf(EnumDataBase.playLists) === -1) {
           let initPlayLists: InterfacePlayLists = {
-            playLists: [ {
-              name: DataBase.songsLoad,
+            playLists: [{
+              name: EnumDataBase.songsLoad,
               paths: []
-            } ]
+            }]
           };
-          storage.set(DataBase.playLists, initPlayLists, dataBaseJsonPath, (error_INIT) => {
+          storage.set(EnumDataBase.playLists, initPlayLists, dataBaseJsonPath, (error_INIT) => {
             if (error_INIT !== undefined) {
               console.log(error_INIT);
             }

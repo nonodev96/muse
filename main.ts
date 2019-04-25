@@ -120,6 +120,12 @@ function createWindow() {
           click() {
             require('electron').shell.openExternal('http://electron.atom.io');
           }
+        },
+        {
+          label: 'Toogle Dev Tools',
+          click() {
+            win.webContents.toggleDevTools();
+          }
         }
       ]
     }

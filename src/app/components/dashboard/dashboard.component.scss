@@ -2,45 +2,63 @@
   margin: 1em;
 }
 
+
+.dashboard-headers-align .mat-expansion-panel-header-title,
+.dashboard-headers-align .mat-expansion-panel-header-description {
+  flex-basis: 0;
+}
+
+.dashboard-headers-align .mat-expansion-panel-header-description {
+  justify-content: space-between;
+  align-items: center;
+}
+
+mat-form-field {
+  margin-right: 12px;
+}
+
 .dashboard {
-
-
   .mat-content {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-  }
-
-
-  .metadata-song {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 0.5fr 1.5fr 1fr;
 
     .picture {
       grid-column-start: 1;
 
       img.img-thumbnail-album {
+        width: 100%;
         max-width: 350px;
         height: auto;
-        margin: 0 auto;
       }
     }
 
-    .title-artist-album {
+    .metadata-song {
       grid-column-start: 2;
-      grid-template-rows: 4em 1em 1em;
+      grid-template-rows: 4em 1em 1em 1em;
 
-      .title {
-        grid-row-start: 1;
+      .title-artist-album {
+        margin-left: 2em;
+
+        .title {
+          grid-row-start: 1;
+        }
+
+        .artist {
+          grid-row-start: 2;
+        }
+
+        .album {
+          grid-row-start: 3;
+        }
+
+        .isrc {
+          grid-row-start: 4;
+        }
       }
+    }
 
-      .artist {
-        grid-row-start: 2;
-      }
-
-      .album {
-        grid-row-start: 3;
-
-      }
+    .controllers {
+      grid-column-start: 3;
     }
   }
 }

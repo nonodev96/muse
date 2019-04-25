@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
-import { IAudioMetadata } from 'music-metadata';
-import { ElectronService } from './electron.service';
+import {Injectable} from '@angular/core';
+import {IAudioMetadata, IOptions} from 'music-metadata';
+import {ElectronService} from './electron.service';
 import * as mm from 'music-metadata/lib/core';
 import * as fs from 'fs';
 
@@ -17,10 +17,10 @@ export class FileService {
     filters: [
       {
         name: 'Music',
-        extensions: [ 'mp3', 'm4a', 'webm', 'wav', 'aac', 'ogg', 'opus' ]
+        extensions: ['mp3', 'm4a', 'webm', 'wav', 'aac', 'ogg', 'opus']
       }
     ],
-    properties: [ 'openFile', 'multiSelections' ]
+    properties: ['openFile', 'multiSelections']
   };
 
 
@@ -50,8 +50,11 @@ export class FileService {
           return null;
         }
 
-        const stream = this.fs.createReadStream(fileNames[ 0 ]);
-        mm.parseStream(stream).then((metadata: IAudioMetadata) => {
+        const stream = this.fs.createReadStream(fileNames[0]);
+        let options: IOptions = {
+          native: true
+        };
+        mm.parseStream(stream, null, options).then((metadata: IAudioMetadata) => {
           stream.close();
           // console.log(metadata);
 
@@ -69,7 +72,7 @@ export class FileService {
       }
 
       const stream = this.fs.createReadStream(path);
-      mm.parseStream(stream)
+      mm.parseStream(stream, null, {native: true})
         .then((metadata: IAudioMetadata) => {
           stream.close();
 

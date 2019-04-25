@@ -1,14 +1,11 @@
 <div class="container-dashboard">
-  <button mat-button (click)="debug()">Dashboard Debug</button>
-  <button mat-button (click)="loadDashboard()">Load Dashboard</button>
 
   <div *ngIf="!songListInFolder">
     <h2>No Hay canciones cargadas</h2>
   </div>
 
   <div *ngIf="songListInFolder" class="dashboard">
-
-    <mat-accordion>
+    <mat-accordion class="dashboard-headers-align">
 
       <mat-expansion-panel *ngFor="let song of songListInFolder; let i = index"
                            (opened)="panelOpenState[i] = true"
@@ -19,12 +16,11 @@
             {{ song.title }}
           </mat-panel-title>
           <mat-panel-description>
-            I'm visible because I am {{ panelOpenState[i] ? 'open' : 'closed' }}
+            {{song.artist}} - {{song.album}}
           </mat-panel-description>
         </mat-expansion-panel-header>
-
-        <div class="metadata-song" *ngIf="song">
-          <div class="picture">
+        <div class="mat-content">
+          <div class="picture" *ngIf="song">
             <div *ngIf="song.audioMetadata.common">
               <div *ngIf="song.audioMetadata.common.picture">
                 <div *ngFor="let picture of song.audioMetadata.common.picture">
@@ -35,34 +31,50 @@
               </div>
             </div>
           </div>
-          <div class="title-artist-album">
-            <div class="title">
-              <div *ngIf="song.title">
-                <h4>Title: {{ song.title }}</h4>
+          <div class="metadata-song" *ngIf="song">
+            <div class="title-artist-album" *ngIf="song.audioMetadata">
+              <div class="title">
+                <div *ngIf="song.title">
+                  <h4>Title: {{ song.title }}</h4>
+                </div>
+              </div>
+              <div class="artist">
+                <p *ngIf="song.audioMetadata.common">
+                  Artista: <span class="artist">{{ song.audioMetadata.common.artist }}</span>
+                </p>
+              </div>
+              <div class="album">
+                <p *ngIf="song.audioMetadata.common">
+                  Album: <span class="album">{{ song.audioMetadata.common.album }}</span>
+                </p>
+              </div>
+              <div class="genres">
+                <p *ngIf="song.audioMetadata.common">
+                  Generos: <span *ngFor="let gen of song.audioMetadata.common.genre">{{gen}}</span>
+                </p>
+              </div>
+              <div class="isrc">
+                <p *ngIf="song.audioMetadata.common">
+                  ISRC: <span *ngFor="let id of song.audioMetadata.common.isrc">{{id}}</span>
+                </p>
+              </div>
+              <div class="path">
+                <p>Path: {{song.src}}</p>
               </div>
             </div>
-            <div class="artist">
-              <p *ngIf="song.audioMetadata.common">
-                <span class="artist">{{ song.audioMetadata.common.artist }}</span>
-              </p>
-            </div>
-            <div class="album">
-              <p *ngIf="song.audioMetadata.common">
-                Album: <span class="album">{{ song.audioMetadata.common.album }}</span>
-              </p>
-            </div>
           </div>
-        </div>
+          <div class="controllers">
 
-        <div class="controllers">
-          <button mat-button (click)="showInfo(song)">Click to see song in debug</button>
-          <button mat-button (click)="playSong(song)">Play song</button>
+            <button mat-button (click)="showInfo(song)">Click to see song in debug</button>
+            <button mat-button (click)="playSong(song)">Play song</button>
+          </div>
+
         </div>
 
       </mat-expansion-panel>
 
     </mat-accordion>
-
-
   </div>
+  <button mat-button (click)="debug()">Dashboard Debug</button>
+  <button mat-button (click)="loadDashboard()">Load Dashboard</button>
 </div>

@@ -2,7 +2,7 @@
 
   <mat-sidenav #elementSidenavID mode="over">
     <mat-nav-list>
-      <h2 mat-subheader> {{ SIDENAV_HEADER_TITLE }} </h2>
+      <h2 mat-subheader> Author: Antonio Mudarra Machuca </h2>
       <mat-divider></mat-divider>
 
       <a mat-list-item (click)="closeSidenav()" routerLink="/dashboard">
@@ -48,10 +48,14 @@
           <mat-icon>menu</mat-icon>
         </button>
 
-        <span> {{ TOOLBAR_TITLE }} </span>
+        <span> Muse uJaén </span>
         <span class="toolbar-spacer"></span>
-        <mat-icon class="toolbar-icon" aria-hidden="false" aria-label="Add to favorite playlist">favorite</mat-icon>
-        <mat-icon class="toolbar-icon" aria-hidden="false" aria-label="Delete from favorite playlist">delete</mat-icon>
+        <button mat-button (click)="addSongToFavorites(song)">
+          <mat-icon class="toolbar-icon" aria-hidden="false" aria-label="Add to favorite playlist">favorite</mat-icon>
+        </button>
+        <button mat-button (click)="deleteSongFromFavorites(song)">
+          <mat-icon class="toolbar-icon" aria-hidden="false" aria-label="Delete from favorite playlist">delete</mat-icon>
+        </button>
       </mat-toolbar-row>
     </mat-toolbar>
 

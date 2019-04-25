@@ -1,14 +1,20 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { PlayerService } from '../../providers/player.service';
-import { FileService } from '../../providers/file.service';
-import { ElectronService } from '../../providers/electron.service';
-import { DatabaseService, InterfaceFavorites, InterfaceFavoriteToAdd, InterfaceFavoriteToDelete } from '../../providers/database.service';
-import { MatSnackBar } from '@angular/material';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {PlayerService} from '../../providers/player.service';
+import {FileService} from '../../providers/file.service';
+import {ElectronService} from '../../providers/electron.service';
+import {
+  DatabaseService,
+  EnumAddFavorites,
+  EnumDeleteFavorites,
+  InterfaceFavoriteToAdd,
+  InterfaceFavoriteToDelete
+} from '../../providers/database.service';
+import {MatSnackBar} from '@angular/material';
 
 @Component({
   selector: 'app-debug',
   templateUrl: './debug.component.html',
-  styleUrls: [ './debug.component.scss' ]
+  styleUrls: ['./debug.component.scss']
 })
 export class DebugComponent implements OnInit, OnDestroy {
 
@@ -45,12 +51,12 @@ export class DebugComponent implements OnInit, OnDestroy {
       path: 'favorite ' + this.i
     };
     this._databaseService.addFavorite(songPathToAdd).then(value => {
-      if (value === true) {
+      if (value === EnumAddFavorites.THE_SONG_HAS_BEEN_ADDED) {
         this.openSnackBar('La cancion se ha añadido a favoritos');
-      } else if (value === false) {
+      } else if (value === EnumAddFavorites.THE_SONG_HAS_NOT_BEEN_ADDED) {
         this.openSnackBar('La cancion no se ha podido añadir a favoritos por un error');
       } else {
-        this.openSnackBar(value);
+        this.openSnackBar('La cancion ya estaba en la lista');
       }
     });
     this.i++;
@@ -64,12 +70,12 @@ export class DebugComponent implements OnInit, OnDestroy {
       path: 'favorite 5'
     };
     this._databaseService.deleteFavorite(songPathToDelete).then(value => {
-      if (value === true) {
-        this.openSnackBar('La cancion se ha borrado de favoritos');
-      } else if (value === false) {
-        this.openSnackBar('La cancion no se ha podido borrar de favoritos por un error');
-      } else {
-        this.openSnackBar(value);
+      if (value === EnumDeleteFavorites.THE_SONG_HAS_BEEN_DELETE) {
+        this.openSnackBar('La canción ha sido eliminada de favoritos');
+      } else if (value === EnumDeleteFavorites.THE_SONG_HAS_NOT_BEEN_DELETE) {
+        this.openSnackBar('La cancion no se ha podido borrar de favoritos');
+      } else if (value === EnumDeleteFavorites.THE_SONG_IS_NOT_IN_FAVORITES) {
+        this.openSnackBar('La cancion no esta en favoritos');
       }
     });
   }

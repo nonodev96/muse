@@ -129,7 +129,7 @@ export class PlayerComponent implements OnInit, OnDestroy {
     this.setVolume($event.value);
   }
 
-  public getFormatTimeLikeSpotify(time: number) {
+  public getFormatTimeLikeSpotify(time: number): string {
     if (typeof time === 'undefined' || isNaN(time)) {
       time = 0;
     }
@@ -148,5 +148,10 @@ export class PlayerComponent implements OnInit, OnDestroy {
       seconds = '0' + seconds;
     }
     return minutes + ':' + seconds;
+  }
+
+  mute() {
+    this.volume = 0;
+    this.setVolume(this.volume);
   }
 }
