@@ -9,8 +9,8 @@ import {Utils} from '../utils/utils';
 
 
 interface InterfaceDataPlayer {
-  analyserNODES: WeakMap<HTMLAudioElement, AnalyserNode>;
-  contextNODES: WeakMap<HTMLAudioElement, MediaElementAudioSourceNode>;
+  analyserNodes_WeakMap: WeakMap<HTMLAudioElement, AnalyserNode>;
+  mediaElementAudioSourceNode_WeakMap: WeakMap<HTMLAudioElement, MediaElementAudioSourceNode>;
   audio: HTMLAudioElement;
   song: Song;
   songList: Song[];
@@ -21,13 +21,13 @@ interface InterfaceDataPlayer {
   providedIn: 'root'
 })
 export class PlayerService {
-  private analyserNODES: WeakMap<HTMLAudioElement, AnalyserNode> = new WeakMap();
-  private contextNODES: WeakMap<HTMLAudioElement, MediaElementAudioSourceNode> = new WeakMap();
+  private analyserNodes_WeakMap: WeakMap<HTMLAudioElement, AnalyserNode> = new WeakMap();
+  private mediaElementAudioSourceNodes_WeakMap: WeakMap<HTMLAudioElement, MediaElementAudioSourceNode> = new WeakMap();
 
   private audio: HTMLAudioElement;
   private audioContext: AudioContext;
   private mediaElementAudioSourceNode: MediaElementAudioSourceNode;
-  private audioContextAnalyserNode: AnalyserNode;
+  private analyserNode: AnalyserNode;
   private song: Song;
   private songList: Song[] = [];
   private iterator: number = -1;
@@ -35,15 +35,17 @@ export class PlayerService {
 
   private playerStatus: BehaviorSubject<string> = new BehaviorSubject('paused');
   private audioObservable: Subject<HTMLAudioElement> = new Subject<HTMLAudioElement>();
+  private audioContextObservable: Subject<AudioContext> = new Subject<AudioContext>();
   private songListObservable: Subject<Song[]> = new Subject<Song[]>();
   private songObservable: Subject<Song> = new Subject<Song>();
   private currentTimeObservable: Subject<number> = new Subject<number>();
   private durationTimeObservable: Subject<number> = new Subject<number>();
   private elapsedTimeObservable: Subject<number> = new Subject<number>();
 
-  private analyserNODES_Observable: Subject<WeakMap<HTMLAudioElement, AnalyserNode>>
+  private analyserNodes_WeakMap_Observable: Subject<WeakMap<HTMLAudioElement, AnalyserNode>>
     = new Subject<WeakMap<HTMLAudioElement, AnalyserNode>>();
-  private contextNODES_Observable: Subject<WeakMap<HTMLAudioElement, MediaElementAudioSourceNode>>
+
+  private mediaElementAudioSourceNodes_WeakMap_Observable: Subject<WeakMap<HTMLAudioElement, MediaElementAudioSourceNode>>
     = new Subject<WeakMap<HTMLAudioElement, MediaElementAudioSourceNode>>();
 
   constructor(private _fileService: FileService,
@@ -56,13 +58,13 @@ export class PlayerService {
     this.audioContext = new AudioContext();
 
     this.mediaElementAudioSourceNode = this.audioContext.createMediaElementSource(this.audio);
-    this.audioContextAnalyserNode = this.audioContext.createAnalyser();
+    this.analyserNode = this.audioContext.createAnalyser();
 
-    this.mediaElementAudioSourceNode.connect(this.audioContextAnalyserNode);
-    this.audioContextAnalyserNode.connect(this.audioContext.destination);
+    this.mediaElementAudioSourceNode.connect(this.analyserNode);
+    this.analyserNode.connect(this.audioContext.destination);
 
-    this.contextNODES.set(this.audio, this.mediaElementAudioSourceNode);
-    this.analyserNODES.set(this.audio, this.audioContextAnalyserNode);
+    this.mediaElementAudioSourceNodes_WeakMap.set(this.audio, this.mediaElementAudioSourceNode);
+    this.analyserNodes_WeakMap.set(this.audio, this.analyserNode);
 
     this.ipcRendererSelectedFiles();
     this.attachListeners();
@@ -92,12 +94,16 @@ export class PlayerService {
     return this.elapsedTimeObservable.asObservable();
   }
 
-  public getAnalyserNODESObservable(): Observable<WeakMap<HTMLAudioElement, AnalyserNode>> {
-    return this.analyserNODES_Observable.asObservable();
+  public getAnalyserNodes_WeakMap_Observable(): Observable<WeakMap<HTMLAudioElement, AnalyserNode>> {
+    return this.analyserNodes_WeakMap_Observable.asObservable();
   }
 
-  public getContextNODESObservable(): Observable<WeakMap<HTMLAudioElement, MediaElementAudioSourceNode>> {
-    return this.contextNODES_Observable.asObservable();
+  public getMediaElementAudioSourceNodes_WeakMap_Observable(): Observable<WeakMap<HTMLAudioElement, MediaElementAudioSourceNode>> {
+    return this.mediaElementAudioSourceNodes_WeakMap_Observable.asObservable();
+  }
+
+  public getAudioContext_Observable(): Observable<AudioContext> {
+    return this.audioContextObservable.asObservable();
   }
 
   public updateSongSubscription() {
@@ -113,11 +119,11 @@ export class PlayerService {
   }
 
   public updateAnalyserNODESSubscription() {
-    this.analyserNODES_Observable.next(this.analyserNODES);
+    this.analyserNodes_WeakMap_Observable.next(this.analyserNodes_WeakMap);
   }
 
-  public updateContextNODESSubscription() {
-    this.contextNODES_Observable.next(this.contextNODES);
+  public updateMediaElementAudioSourceNodes_WeakMap_Subcription() {
+    this.mediaElementAudioSourceNodes_WeakMap_Observable.next(this.mediaElementAudioSourceNodes_WeakMap);
   }
 
   public playerTogglePlayPause() {
@@ -133,7 +139,9 @@ export class PlayerService {
     }
     this.songObservable.next(this.song);
     this.audioObservable.next(this.audio);
-    this.analyserNODES_Observable.next(this.analyserNODES);
+    this.audioContextObservable.next(this.audioContext);
+    this.analyserNodes_WeakMap_Observable.next(this.analyserNodes_WeakMap);
+    this.mediaElementAudioSourceNodes_WeakMap_Observable.next(this.mediaElementAudioSourceNodes_WeakMap);
 
     return this.audio.paused;
   }
@@ -158,25 +166,24 @@ export class PlayerService {
     this.setSong(song);
 
     if (this._electronService.isElectron()) {
-      this.audio.src = 'file:///' + song.src;
+      // this.audio.src = 'file:///' + song.src;
     } else {
-      this.audio.src = './assets/02. Copacabana.mp3';
     }
-    // this.audio.srcOb
+    this.audio.src = './assets/02. Copacabana.mp3';
 
-    if (this.analyserNODES.has(this.audio)) {
-      this.mediaElementAudioSourceNode = this.contextNODES.get(this.audio);
-      this.audioContextAnalyserNode = this.analyserNODES.get(this.audio);
+    if (this.analyserNodes_WeakMap.has(this.audio)) {
+      this.mediaElementAudioSourceNode = this.mediaElementAudioSourceNodes_WeakMap.get(this.audio);
+      this.analyserNode = this.analyserNodes_WeakMap.get(this.audio);
     } else {
       this.audioContext = new AudioContext();
       this.mediaElementAudioSourceNode = this.audioContext.createMediaElementSource(this.audio);
-      this.audioContextAnalyserNode = this.audioContext.createAnalyser();
+      this.analyserNode = this.audioContext.createAnalyser();
 
-      this.mediaElementAudioSourceNode.connect(this.audioContextAnalyserNode);
-      this.audioContextAnalyserNode.connect(this.audioContext.destination);
+      this.mediaElementAudioSourceNode.connect(this.analyserNode);
+      this.analyserNode.connect(this.audioContext.destination);
 
-      this.analyserNODES.set(this.audio, this.audioContextAnalyserNode);
-      this.contextNODES.set(this.audio, this.mediaElementAudioSourceNode);
+      this.analyserNodes_WeakMap.set(this.audio, this.analyserNode);
+      this.mediaElementAudioSourceNodes_WeakMap.set(this.audio, this.mediaElementAudioSourceNode);
     }
   }
 
@@ -264,8 +271,8 @@ export class PlayerService {
 
   public getData(): InterfaceDataPlayer {
     return {
-      'analyserNODES': this.analyserNODES,
-      'contextNODES': this.contextNODES,
+      'analyserNodes_WeakMap': this.analyserNodes_WeakMap,
+      'mediaElementAudioSourceNode_WeakMap': this.mediaElementAudioSourceNodes_WeakMap,
       'audio': this.audio,
       'song': this.song,
       'songList': this.songList,

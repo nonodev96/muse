@@ -54,7 +54,7 @@ export class AudioVisualizerComponent implements OnInit, OnDestroy, AfterViewIni
         // console.log('subscribe audio');
         this.audio = audio;
       });
-    this.ANALYSER_NODES_Subscription = this._playerService.getAnalyserNODESObservable()
+    this.ANALYSER_NODES_Subscription = this._playerService.getAnalyserNodes_WeakMap_Observable()
       .subscribe((ANALYSER_NODES: WeakMap<HTMLAudioElement, AnalyserNode>) => {
         // console.log('subscribe NODES');
         this.ANALYSER_NODES = ANALYSER_NODES;
