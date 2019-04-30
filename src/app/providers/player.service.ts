@@ -6,6 +6,7 @@ import {IAudioMetadata} from 'music-metadata/lib/type';
 import {ElectronService} from './electron.service';
 import {EnumDataBase, DatabaseService, InterfacePlayList} from './database.service';
 import {Utils} from '../utils/utils';
+import {SendDataEqualizerInterface} from '../components/equalizer/equalizer.component';
 
 
 interface InterfaceDataPlayer {
@@ -24,10 +25,18 @@ export class PlayerService {
   private analyserNodes_WeakMap: WeakMap<HTMLAudioElement, AnalyserNode> = new WeakMap();
   private mediaElementAudioSourceNodes_WeakMap: WeakMap<HTMLAudioElement, MediaElementAudioSourceNode> = new WeakMap();
 
+  private analyserNodes_WeakMap_Observable: Subject<WeakMap<HTMLAudioElement, AnalyserNode>>
+    = new Subject<WeakMap<HTMLAudioElement, AnalyserNode>>();
+  private mediaElementAudioSourceNodes_WeakMap_Observable: Subject<WeakMap<HTMLAudioElement, MediaElementAudioSourceNode>>
+    = new Subject<WeakMap<HTMLAudioElement, MediaElementAudioSourceNode>>();
+
   private audio: HTMLAudioElement;
   private audioContext: AudioContext;
   private mediaElementAudioSourceNode: MediaElementAudioSourceNode;
   private analyserNode: AnalyserNode;
+  private biquadFilterNode: BiquadFilterNode;
+  private gainNode: GainNode;
+
   private song: Song;
   private songList: Song[] = [];
   private iterator: number = -1;
@@ -42,12 +51,6 @@ export class PlayerService {
   private durationTimeObservable: Subject<number> = new Subject<number>();
   private elapsedTimeObservable: Subject<number> = new Subject<number>();
 
-  private analyserNodes_WeakMap_Observable: Subject<WeakMap<HTMLAudioElement, AnalyserNode>>
-    = new Subject<WeakMap<HTMLAudioElement, AnalyserNode>>();
-
-  private mediaElementAudioSourceNodes_WeakMap_Observable: Subject<WeakMap<HTMLAudioElement, MediaElementAudioSourceNode>>
-    = new Subject<WeakMap<HTMLAudioElement, MediaElementAudioSourceNode>>();
-
   constructor(private _fileService: FileService,
               private _databaseService: DatabaseService,
               private _electronService: ElectronService
@@ -59,9 +62,16 @@ export class PlayerService {
 
     this.mediaElementAudioSourceNode = this.audioContext.createMediaElementSource(this.audio);
     this.analyserNode = this.audioContext.createAnalyser();
+    this.biquadFilterNode = this.audioContext.createBiquadFilter();
+    this.gainNode = this.audioContext.createGain();
+
+    // this.mediaElementAudioSourceNode.connect(this.analyserNode);
+    // this.analyserNode.connect(this.audioContext.destination);
 
     this.mediaElementAudioSourceNode.connect(this.analyserNode);
-    this.analyserNode.connect(this.audioContext.destination);
+    this.analyserNode.connect(this.gainNode);
+    this.gainNode.connect(this.biquadFilterNode);
+    this.biquadFilterNode.connect(this.audioContext.destination);
 
     this.mediaElementAudioSourceNodes_WeakMap.set(this.audio, this.mediaElementAudioSourceNode);
     this.analyserNodes_WeakMap.set(this.audio, this.analyserNode);
@@ -225,6 +235,26 @@ export class PlayerService {
 
   public setCurrentTime(time: number) {
     this.audio.currentTime = time;
+  }
+
+  public defaultEqualizer() {
+    let filterTypeSelected: BiquadFilterType = 'allpass';
+    console.log(filterTypeSelected);
+    this.biquadFilterNode.type = filterTypeSelected;
+    this.biquadFilterNode.frequency.value = this.biquadFilterNode.frequency.defaultValue;
+    this.biquadFilterNode.Q.value = this.biquadFilterNode.Q.defaultValue;
+    this.biquadFilterNode.gain.value = this.biquadFilterNode.gain.defaultValue;
+
+    this.gainNode.gain.value = this.gainNode.gain.defaultValue;
+  }
+
+  public setEqualizer(data: SendDataEqualizerInterface) {
+    this.biquadFilterNode.type = data.filterTypeSelected;
+    this.biquadFilterNode.frequency.value = data.fValue;
+    this.biquadFilterNode.Q.value = data.qValue;
+    this.biquadFilterNode.gain.value = data.gValue;
+
+    this.gainNode.gain.value = this.gainNode.gain.defaultValue;
   }
 
   private setPlayerStatus(key) {
