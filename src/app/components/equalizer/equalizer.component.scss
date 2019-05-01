@@ -22,8 +22,9 @@
         justify-items: center;
         align-items: center;
 
-        .scope {
+        .scope-min {
           grid-column-start: 1;
+          justify-self: center;
         }
 
         .mat-slider-eq {
@@ -31,7 +32,7 @@
           width: 100%;
         }
 
-        .scope-min {
+        .scope-max {
           grid-column-start: 3;
           justify-self: center;
         }

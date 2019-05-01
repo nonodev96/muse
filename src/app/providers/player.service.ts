@@ -34,8 +34,10 @@ export class PlayerService {
   private audioContext: AudioContext;
   private mediaElementAudioSourceNode: MediaElementAudioSourceNode;
   private analyserNode: AnalyserNode;
-  private biquadFilterNode: BiquadFilterNode;
+  // private biquadFilterNode: BiquadFilterNode;
   private gainNode: GainNode;
+  private waveShaperNode: WaveShaperNode;
+  private convolverNode: ConvolverNode;
 
   private song: Song;
   private songList: Song[] = [];
@@ -50,6 +52,10 @@ export class PlayerService {
   private currentTimeObservable: Subject<number> = new Subject<number>();
   private durationTimeObservable: Subject<number> = new Subject<number>();
   private elapsedTimeObservable: Subject<number> = new Subject<number>();
+  private highShelfNode: BiquadFilterNode;
+  private lowShelfNode: BiquadFilterNode;
+  private highPassNode: BiquadFilterNode;
+  private lowPassNode: BiquadFilterNode;
 
   constructor(private _fileService: FileService,
               private _databaseService: DatabaseService,
@@ -62,16 +68,57 @@ export class PlayerService {
 
     this.mediaElementAudioSourceNode = this.audioContext.createMediaElementSource(this.audio);
     this.analyserNode = this.audioContext.createAnalyser();
-    this.biquadFilterNode = this.audioContext.createBiquadFilter();
+    this.waveShaperNode = this.audioContext.createWaveShaper();
     this.gainNode = this.audioContext.createGain();
+    // this.biquadFilterNode = this.audioContext.createBiquadFilter();
+    this.convolverNode = this.audioContext.createConvolver();
 
-    // this.mediaElementAudioSourceNode.connect(this.analyserNode);
-    // this.analyserNode.connect(this.audioContext.destination);
+    /*
+      this.mediaElementAudioSourceNode.connect(this.analyserNode);
+      this.analyserNode.connect(this.waveShaperNode);
+      this.waveShaperNode.connect(this.biquadFilterNode);
+      this.biquadFilterNode.connect(this.convolverNode);
+      this.convolverNode.connect(this.gainNode);
+      this.gainNode.connect(this.audioContext.destination);
+
+      this.biquadFilterNode.type = 'allpass';
+      this.biquadFilterNode.frequency.setValueAtTime(1000, this.audioContext.currentTime);
+      this.biquadFilterNode.gain.setValueAtTime(25, this.audioContext.currentTime);
+    */
 
     this.mediaElementAudioSourceNode.connect(this.analyserNode);
     this.analyserNode.connect(this.gainNode);
-    this.gainNode.connect(this.biquadFilterNode);
-    this.biquadFilterNode.connect(this.audioContext.destination);
+    // this.gainNode.connect(this.biquadFilterNode);
+    // this.biquadFilterNode.connect(this.audioContext.destination);
+
+    this.highShelfNode = this.audioContext.createBiquadFilter();
+    this.lowShelfNode = this.audioContext.createBiquadFilter();
+    this.highPassNode = this.audioContext.createBiquadFilter();
+    this.lowPassNode = this.audioContext.createBiquadFilter();
+
+    this.highShelfNode.type = 'highshelf';
+    this.highShelfNode.frequency.value = 4700;
+    this.highShelfNode.gain.value = 50;
+
+    this.lowShelfNode.type = 'lowshelf';
+    this.lowShelfNode.frequency.value = 35;
+    this.lowShelfNode.gain.value = 50;
+
+    this.highPassNode.type = 'highpass';
+    this.highPassNode.frequency.value = 800;
+    this.highPassNode.Q.value = 0.7;
+
+    this.lowPassNode.type = 'lowpass';
+    this.lowPassNode.frequency.value = 880;
+    this.lowPassNode.Q.value = 0.7;
+
+
+    this.gainNode.connect(this.highShelfNode);
+    this.highShelfNode.connect(this.lowShelfNode);
+    this.lowShelfNode.connect(this.highPassNode);
+    this.highPassNode.connect(this.lowPassNode);
+    this.lowPassNode.connect(this.audioContext.destination);
+
 
     this.mediaElementAudioSourceNodes_WeakMap.set(this.audio, this.mediaElementAudioSourceNode);
     this.analyserNodes_WeakMap.set(this.audio, this.analyserNode);
@@ -184,13 +231,60 @@ export class PlayerService {
     if (this.analyserNodes_WeakMap.has(this.audio)) {
       this.mediaElementAudioSourceNode = this.mediaElementAudioSourceNodes_WeakMap.get(this.audio);
       this.analyserNode = this.analyserNodes_WeakMap.get(this.audio);
+      console.log('existe');
     } else {
+      console.log('no existe');
+
       this.audioContext = new AudioContext();
+
       this.mediaElementAudioSourceNode = this.audioContext.createMediaElementSource(this.audio);
       this.analyserNode = this.audioContext.createAnalyser();
+      this.waveShaperNode = this.audioContext.createWaveShaper();
+      this.gainNode = this.audioContext.createGain();
+      // this.biquadFilterNode = this.audioContext.createBiquadFilter();
+      this.convolverNode = this.audioContext.createConvolver();
 
+      /*
       this.mediaElementAudioSourceNode.connect(this.analyserNode);
-      this.analyserNode.connect(this.audioContext.destination);
+      this.analyserNode.connect(this.gainNode);
+      this.gainNode.connect(this.biquadFilterNode);
+      this.biquadFilterNode.connect(this.audioContext.destination);
+      */
+      this.highShelfNode = this.audioContext.createBiquadFilter();
+      this.lowShelfNode = this.audioContext.createBiquadFilter();
+      this.highPassNode = this.audioContext.createBiquadFilter();
+      this.lowPassNode = this.audioContext.createBiquadFilter();
+
+      this.highShelfNode.type = 'highshelf';
+      this.highShelfNode.frequency.value = 4700;
+      this.highShelfNode.gain.value = 50;
+
+      this.lowShelfNode.type = 'lowshelf';
+      this.lowShelfNode.frequency.value = 35;
+      this.lowShelfNode.gain.value = 50;
+
+      this.highPassNode.type = 'highpass';
+      this.highPassNode.frequency.value = 800;
+      this.highPassNode.Q.value = 0.7;
+
+      this.lowPassNode.type = 'lowpass';
+      this.lowPassNode.frequency.value = 880;
+      this.lowPassNode.Q.value = 0.7;
+
+
+      this.gainNode.connect(this.highShelfNode);
+      this.highShelfNode.connect(this.lowShelfNode);
+      this.lowShelfNode.connect(this.highPassNode);
+      this.highPassNode.connect(this.lowPassNode);
+      this.lowPassNode.connect(this.audioContext.destination);
+      /*
+      this.mediaElementAudioSourceNode.connect(this.analyserNode);
+      this.analyserNode.connect(this.waveShaperNode);
+      this.waveShaperNode.connect(this.biquadFilterNode);
+      this.biquadFilterNode.connect(this.convolverNode);
+      this.convolverNode.connect(this.gainNode);
+      this.gainNode.connect(this.audioContext.destination);
+      */
 
       this.analyserNodes_WeakMap.set(this.audio, this.analyserNode);
       this.mediaElementAudioSourceNodes_WeakMap.set(this.audio, this.mediaElementAudioSourceNode);
@@ -238,23 +332,57 @@ export class PlayerService {
   }
 
   public defaultEqualizer() {
-    let filterTypeSelected: BiquadFilterType = 'allpass';
-    console.log(filterTypeSelected);
+    console.log('defaultEqualizer');
+    /*
     this.biquadFilterNode.type = filterTypeSelected;
     this.biquadFilterNode.frequency.value = this.biquadFilterNode.frequency.defaultValue;
     this.biquadFilterNode.Q.value = this.biquadFilterNode.Q.defaultValue;
     this.biquadFilterNode.gain.value = this.biquadFilterNode.gain.defaultValue;
+    */
 
-    this.gainNode.gain.value = this.gainNode.gain.defaultValue;
+    this.highShelfNode.type = 'highshelf';
+    this.highShelfNode.frequency.value = 4700;
+    this.highShelfNode.gain.value = 50;
+
+    this.lowShelfNode.type = 'lowshelf';
+    this.lowShelfNode.frequency.value = 35;
+    this.lowShelfNode.gain.value = 50;
+
+    this.highPassNode.type = 'highpass';
+    this.highPassNode.frequency.value = 800;
+    this.highPassNode.Q.value = 0.7;
+
+    this.lowPassNode.type = 'lowpass';
+    this.lowPassNode.frequency.value = 880;
+    this.lowPassNode.Q.value = 0.7;
   }
 
   public setEqualizer(data: SendDataEqualizerInterface) {
-    this.biquadFilterNode.type = data.filterTypeSelected;
-    this.biquadFilterNode.frequency.value = data.fValue;
-    this.biquadFilterNode.Q.value = data.qValue;
-    this.biquadFilterNode.gain.value = data.gValue;
+    switch (data.filterTypeSelected) {
+      case 'highshelf':
+        this.highShelfNode.type = 'highshelf';
+        this.highShelfNode.frequency.value = data.fValue; // 4700;
+        this.highShelfNode.gain.value = data.gValue; // 50;
+        break;
 
-    this.gainNode.gain.value = this.gainNode.gain.defaultValue;
+      case 'lowshelf':
+        this.lowShelfNode.type = 'lowshelf';
+        this.lowShelfNode.frequency.value = data.fValue; // 35;
+        this.lowShelfNode.gain.value = data.gValue; // 50;
+        break;
+
+      case 'highpass':
+        this.highPassNode.type = 'highpass';
+        this.highPassNode.frequency.value = data.fValue; // 800;
+        this.highPassNode.Q.value = data.qValue; // 0.7;
+        break;
+
+      case 'lowpass':
+        this.lowPassNode.type = 'lowpass';
+        this.lowPassNode.frequency.value = data.fValue; // 880;
+        this.lowPassNode.Q.value = data.qValue; // 0.7;
+        break;
+    }
   }
 
   private setPlayerStatus(key) {

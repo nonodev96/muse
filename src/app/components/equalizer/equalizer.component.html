@@ -19,35 +19,41 @@
       <p>{{filterTypeSelected}}</p>
     </div>
 
-    <div class="sliders">
+    <div class="sliders" *ngFor="let slider of filterType">
+
 
       <div class="range-slider">
-        <span class="scope scope-min">{{biquadFilterNode.frequency.minValue}}</span>
+        <span class="scope scope-min">{{slider.frequency.minValue}}</span>
         <mat-slider class="mat-slider-eq"
-                    min="{{biquadFilterNode.frequency.minValue}}"
-                    max="{{biquadFilterNode.frequency.maxValue}}"
-                    step="1" [(ngModel)]="fValue"></mat-slider>
-        <span class="scope scope-max">{{biquadFilterNode.frequency.maxValue}}</span>
+                    min="{{slider.frequency.minValue}}"
+                    max="{{slider.frequency.maxValue}}"
+                    step="{{slider.frequency.step}}"
+                    [thumbLabel]="true"
+                    [(ngModel)]="slider.frequency.value"></mat-slider>
+        <span class="scope scope-max">{{slider.frequency.maxValue}}</span>
         <span class="param">Hz</span>
       </div>
 
-      <div class="range-slider">
-        <span class="scope scope-min">{{biquadFilterNode.Q.minValue}}</span>
+      <div class="range-slider" *ngIf="slider.gain">
+        <span class="scope scope-min">{{slider.gain.maxValue}}</span>
         <mat-slider class="mat-slider-eq"
-                    min="{{biquadFilterNode.Q.minValue}}"
-                    max="{{biquadFilterNode.Q.maxValue}}"
-                    step="1" [(ngModel)]="qValue"></mat-slider>
-        <span class="scope scope-max">{{biquadFilterNode.Q.maxValue}}</span>
+                    min="{{slider.gain.minValue}}"
+                    max="{{slider.gain.maxValue}}"
+                    step="{{slider.gain.step}}"
+                    [(ngModel)]="slider.gain.value"></mat-slider>
+        <span class="scope scope-max">{{slider.gain.maxValue}}</span>
         <span class="param">Hz</span>
       </div>
 
-      <div class="range-slider">
-        <span class="scope scope-min">{{biquadFilterNode.gain.maxValue}}</span>
+
+      <div class="range-slider" *ngIf="slider.Q">
+        <span class="scope scope-min">{{slider.Q.maxValue}}</span>
         <mat-slider class="mat-slider-eq"
-                    min="{{biquadFilterNode.gain.minValue}}"
-                    max="{{biquadFilterNode.gain.maxValue}}"
-                    step="1" [(ngModel)]="gValue"></mat-slider>
-        <span class="scope scope-max">{{biquadFilterNode.gain.maxValue}}</span>
+                    min="{{slider.Q.minValue}}"
+                    max="{{slider.Q.maxValue}}"
+                    step="{{slider.Q.step}}"
+                    [(ngModel)]="slider.Q.value"></mat-slider>
+        <span class="scope scope-max">{{slider.Q.maxValue}}</span>
         <span class="param">Hz</span>
       </div>
 

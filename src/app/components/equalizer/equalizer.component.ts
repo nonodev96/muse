@@ -1,17 +1,34 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {PlayerService} from '../../providers/player.service';
-import {Subscription} from 'rxjs';
 
 export interface FilterTypeInterface {
-  value: string;
   viewValue: string;
+  value: string;
+  frequency: {
+    value: number;
+    minValue: number;
+    maxValue: number;
+    step: number;
+  };
+  gain?: {
+    value: number;
+    minValue: number;
+    maxValue: number;
+    step: number;
+  };
+  Q?: {
+    value: number;
+    minValue: number;
+    maxValue: number;
+    step: number;
+  };
 }
 
 export interface SendDataEqualizerInterface {
   filterTypeSelected: BiquadFilterType;
   fValue: number;
-  gValue: number;
-  qValue: number;
+  gValue?: number;
+  qValue?: number;
 }
 
 @Component({
@@ -20,35 +37,83 @@ export interface SendDataEqualizerInterface {
   styleUrls: ['./equalizer.component.scss']
 })
 export class EqualizerComponent implements OnInit, OnDestroy {
-  private biquadFilterNode: BiquadFilterNode;
-  private gainNode: GainNode;
 
   public filterType: FilterTypeInterface[] = [
-    {value: 'lowpass', viewValue: 'Lowpass'},
-    {value: 'highpass', viewValue: 'Highpass'},
-    {value: 'bandpass', viewValue: 'Bandpass'},
-    {value: 'notch', viewValue: 'Notch'},
-    {value: 'lowshelf', viewValue: 'Lowshelf'},
-    {value: 'highshelf', viewValue: 'Highshelf'},
-    {value: 'peaking', viewValue: 'Peaking'},
-    {value: 'allpass', viewValue: 'Allpass'},
+    {
+      value: 'highshelf',
+      viewValue: 'Highshelf',
+      frequency: {
+        value: 4700,
+        minValue: 4700,
+        maxValue: 22000,
+        step: 100
+      },
+      gain: {
+        value: 50,
+        minValue: -50,
+        maxValue: 50,
+        step: 1
+      }
+    },
+    {
+      viewValue: 'Lowshelf',
+      value: 'lowshelf',
+      frequency: {
+        value: 35,
+        minValue: 35,
+        maxValue: 220,
+        step: 1
+      },
+      gain: {
+        value: 50,
+        minValue: -50,
+        maxValue: 50,
+        step: 1
+      }
+    },
+    {
+      viewValue: 'Highpass',
+      value: 'highpass',
+      frequency: {
+        value: 35,
+        minValue: 800,
+        maxValue: 5900,
+        step: 100
+      },
+      Q: {
+        value: 0.7,
+        minValue: 0.7,
+        maxValue: 12,
+        step: 0.1
+      }
+    },
+    {
+      viewValue: 'Lowpass',
+      value: 'lowpass',
+      frequency: {
+        value: 880,
+        minValue: 80,
+        maxValue: 1600,
+        step: 10
+      },
+      Q: {
+        value: 0.7,
+        minValue: 0.7,
+        maxValue: 12,
+        step: 0.1
+      }
+    },
+    // {value: 'bandpass', viewValue: 'Bandpass'},
+    // {value: 'notch', viewValue: 'Notch'},
+    // {value: 'peaking', viewValue: 'Peaking'},
+    // {value: 'allpass', viewValue: 'Allpass'},
   ];
-  public filterTypeSelected: BiquadFilterType = 'allpass';
-  public fValue = 0;
-  public qValue = 0;
-  public gValue = 0;
 
   constructor(private _playerService: PlayerService) {
 
   }
 
   ngOnInit() {
-    let audioContext = new AudioContext();
-    this.biquadFilterNode = audioContext.createBiquadFilter();
-    this.gainNode = audioContext.createBiquadFilter();
-    this.fValue = this.biquadFilterNode.frequency.defaultValue;
-    this.qValue = this.biquadFilterNode.Q.defaultValue;
-    this.gValue = this.biquadFilterNode.gain.defaultValue;
   }
 
   ngOnDestroy(): void {
@@ -68,32 +133,44 @@ export class EqualizerComponent implements OnInit, OnDestroy {
   }
 
   console() {
-    console.log(this.filterTypeSelected, this.fValue, this.qValue, this.gValue);
-    console.log(this.gainNode, this.biquadFilterNode);
+    console.log(this.filterType);
   }
 
   default() {
     this._playerService.defaultEqualizer();
-    this.filterTypeSelected = 'allpass';
-    this.biquadFilterNode.type = this.filterTypeSelected;
-    this.biquadFilterNode.frequency.value = this.biquadFilterNode.frequency.defaultValue;
-    this.biquadFilterNode.Q.value = this.biquadFilterNode.Q.defaultValue;
-    this.biquadFilterNode.gain.value = this.biquadFilterNode.gain.defaultValue;
-
-    this.gainNode.gain.value = this.gainNode.gain.defaultValue;
-
-    this.fValue = this.biquadFilterNode.frequency.defaultValue;
-    this.qValue = this.biquadFilterNode.Q.defaultValue;
-    this.gValue = this.biquadFilterNode.gain.defaultValue;
   }
 
   send() {
-    let data: SendDataEqualizerInterface = {
-      filterTypeSelected: this.filterTypeSelected,
-      fValue: this.fValue,
-      qValue: this.qValue,
-      gValue: this.gValue,
+    let data: SendDataEqualizerInterface;
+
+    data = {
+      filterTypeSelected: 'highshelf',
+      fValue: this.filterType[0].frequency.value,
+      gValue: this.filterType[0].gain.value
     };
     this._playerService.setEqualizer(data);
+
+    data = {
+      filterTypeSelected: 'lowshelf',
+      fValue: this.filterType[1].frequency.value,
+      gValue: this.filterType[1].gain.value
+    };
+    this._playerService.setEqualizer(data);
+
+    data = {
+      filterTypeSelected: 'highpass',
+      fValue: this.filterType[2].frequency.value,
+      qValue: this.filterType[2].Q.value
+    };
+    this._playerService.setEqualizer(data);
+
+    data = {
+      filterTypeSelected: 'lowpass',
+      fValue: this.filterType[3].frequency.value,
+      qValue: this.filterType[3].Q.value
+    };
+
+    this._playerService.setEqualizer(data);
+
   }
 }
