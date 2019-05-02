@@ -128,19 +128,32 @@ export class EqualizerComponent implements OnInit, OnDestroy {
      */
   }
 
-  public update(): void {
-    this.console();
+  public disconnect() {
+    this._playerService.disconnect();
   }
 
-  console() {
+  public connect() {
+    this._playerService.connect();
+  }
+
+  public debug() {
     console.log(this.filterType);
   }
 
-  default() {
-    this._playerService.defaultEqualizer();
+  public default() {
+    this.filterType[0].frequency.value = 4700;
+    this.filterType[0].gain.value = 50;
+    this.filterType[1].frequency.value = 35;
+    this.filterType[1].gain.value = 50;
+    this.filterType[2].frequency.value = 800;
+    this.filterType[2].Q.value = 0.7;
+    this.filterType[3].frequency.value = 880;
+    this.filterType[3].Q.value = 0.7;
+
+    this.send();
   }
 
-  send() {
+  public send() {
     let data: SendDataEqualizerInterface;
 
     data = {
@@ -171,6 +184,5 @@ export class EqualizerComponent implements OnInit, OnDestroy {
     };
 
     this._playerService.setEqualizer(data);
-
   }
 }

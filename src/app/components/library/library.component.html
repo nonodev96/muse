@@ -1,5 +1,5 @@
 <div class="container">
-  <table class="form-filters" cellspacing="0">
+  <table class="form-filters">
     <tr>
       <td>
         <mat-form-field class="filter" floatLabel="never">
@@ -21,7 +21,7 @@
       </td>
     </tr>
   </table>
-  <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+  <mat-paginator [pageSizeOptions]="[10, 20]" showFirstLastButtons></mat-paginator>
 
   <table mat-table class="form-songs" [dataSource]="dataSource" matSort>
     <!-- HEADERS -->
@@ -29,6 +29,14 @@
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
     <!-- COLUMNS -->
+    <ng-container matColumnDef="play">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Play</th>
+      <td mat-cell *matCellDef="let element">
+        <button mat-button (click)="play_music(element)">
+          <mat-icon>play_arrow</mat-icon>
+        </button>
+      </td>
+    </ng-container>
     <ng-container matColumnDef="title">
       <th mat-header-cell *matHeaderCellDef mat-sort-header> Title</th>
       <td mat-cell *matCellDef="let element"> {{element.title}} </td>

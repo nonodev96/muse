@@ -8,6 +8,7 @@ import {SongComponent} from './components/song/song.component';
 import {AudioVisualizerComponent} from './components/audio-visualizer/audio-visualizer.component';
 import {LibraryComponent} from './components/library/library.component';
 import {EqualizerComponent} from './components/equalizer/equalizer.component';
+import {FavoritesComponent} from './components/favorites/favorites.component';
 
 const routes: Routes = [
 //    { path: '', component: HomeComponent },
@@ -15,6 +16,7 @@ const routes: Routes = [
   {path: 'dashboard', component: DashboardComponent},
   {path: 'equalizer', component: EqualizerComponent},
   {path: 'library', component: LibraryComponent},
+  {path: 'favorites', component: FavoritesComponent},
   {path: 'settings', component: SettingsComponent},
   {path: 'debug', component: DebugComponent},
   {path: 'song', component: SongComponent},

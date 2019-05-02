@@ -35,9 +35,9 @@ export class PlayerService {
   private mediaElementAudioSourceNode: MediaElementAudioSourceNode;
   private analyserNode: AnalyserNode;
   // private biquadFilterNode: BiquadFilterNode;
-  private gainNode: GainNode;
-  private waveShaperNode: WaveShaperNode;
-  private convolverNode: ConvolverNode;
+  // private gainNode: GainNode;
+  // private waveShaperNode: WaveShaperNode;
+  // private convolverNode: ConvolverNode;
 
   private song: Song;
   private songList: Song[] = [];
@@ -68,26 +68,13 @@ export class PlayerService {
 
     this.mediaElementAudioSourceNode = this.audioContext.createMediaElementSource(this.audio);
     this.analyserNode = this.audioContext.createAnalyser();
-    this.waveShaperNode = this.audioContext.createWaveShaper();
-    this.gainNode = this.audioContext.createGain();
+    // this.waveShaperNode = this.audioContext.createWaveShaper();
+    // this.gainNode = this.audioContext.createGain();
     // this.biquadFilterNode = this.audioContext.createBiquadFilter();
-    this.convolverNode = this.audioContext.createConvolver();
-
-    /*
-      this.mediaElementAudioSourceNode.connect(this.analyserNode);
-      this.analyserNode.connect(this.waveShaperNode);
-      this.waveShaperNode.connect(this.biquadFilterNode);
-      this.biquadFilterNode.connect(this.convolverNode);
-      this.convolverNode.connect(this.gainNode);
-      this.gainNode.connect(this.audioContext.destination);
-
-      this.biquadFilterNode.type = 'allpass';
-      this.biquadFilterNode.frequency.setValueAtTime(1000, this.audioContext.currentTime);
-      this.biquadFilterNode.gain.setValueAtTime(25, this.audioContext.currentTime);
-    */
+    // this.convolverNode = this.audioContext.createConvolver();
 
     this.mediaElementAudioSourceNode.connect(this.analyserNode);
-    this.analyserNode.connect(this.gainNode);
+    this.analyserNode.connect(this.audioContext.destination);
     // this.gainNode.connect(this.biquadFilterNode);
     // this.biquadFilterNode.connect(this.audioContext.destination);
 
@@ -112,12 +99,11 @@ export class PlayerService {
     this.lowPassNode.frequency.value = 880;
     this.lowPassNode.Q.value = 0.7;
 
-
-    this.gainNode.connect(this.highShelfNode);
-    this.highShelfNode.connect(this.lowShelfNode);
-    this.lowShelfNode.connect(this.highPassNode);
-    this.highPassNode.connect(this.lowPassNode);
-    this.lowPassNode.connect(this.audioContext.destination);
+    // this.gainNode.connect(this.highShelfNode);
+    // this.highShelfNode.connect(this.lowShelfNode);
+    // this.lowShelfNode.connect(this.highPassNode);
+    // this.highPassNode.connect(this.lowPassNode);
+    // this.lowPassNode.connect(this.audioContext.destination);
 
 
     this.mediaElementAudioSourceNodes_WeakMap.set(this.audio, this.mediaElementAudioSourceNode);
@@ -221,35 +207,27 @@ export class PlayerService {
 
   public setPlayer(song: Song) {
     this.setSong(song);
-
-    if (this._electronService.isElectron()) {
-      // this.audio.src = 'file:///' + song.src;
+    console.log(ElectronService.isServer(), ElectronService.isElectron());
+    if (ElectronService.isServer()) {
     } else {
+      this.audio.src = './assets/02. Copacabana.mp3';
     }
-    this.audio.src = './assets/02. Copacabana.mp3';
+    // this.audio.src = 'file:///' + song.src;
 
     if (this.analyserNodes_WeakMap.has(this.audio)) {
       this.mediaElementAudioSourceNode = this.mediaElementAudioSourceNodes_WeakMap.get(this.audio);
       this.analyserNode = this.analyserNodes_WeakMap.get(this.audio);
-      console.log('existe');
     } else {
-      console.log('no existe');
 
       this.audioContext = new AudioContext();
 
       this.mediaElementAudioSourceNode = this.audioContext.createMediaElementSource(this.audio);
       this.analyserNode = this.audioContext.createAnalyser();
-      this.waveShaperNode = this.audioContext.createWaveShaper();
-      this.gainNode = this.audioContext.createGain();
+      // this.waveShaperNode = this.audioContext.createWaveShaper();
+      // this.gainNode = this.audioContext.createGain();
       // this.biquadFilterNode = this.audioContext.createBiquadFilter();
-      this.convolverNode = this.audioContext.createConvolver();
+      // this.convolverNode = this.audioContext.createConvolver();
 
-      /*
-      this.mediaElementAudioSourceNode.connect(this.analyserNode);
-      this.analyserNode.connect(this.gainNode);
-      this.gainNode.connect(this.biquadFilterNode);
-      this.biquadFilterNode.connect(this.audioContext.destination);
-      */
       this.highShelfNode = this.audioContext.createBiquadFilter();
       this.lowShelfNode = this.audioContext.createBiquadFilter();
       this.highPassNode = this.audioContext.createBiquadFilter();
@@ -272,19 +250,11 @@ export class PlayerService {
       this.lowPassNode.Q.value = 0.7;
 
 
-      this.gainNode.connect(this.highShelfNode);
+      this.analyserNode.connect(this.highShelfNode);
       this.highShelfNode.connect(this.lowShelfNode);
       this.lowShelfNode.connect(this.highPassNode);
       this.highPassNode.connect(this.lowPassNode);
       this.lowPassNode.connect(this.audioContext.destination);
-      /*
-      this.mediaElementAudioSourceNode.connect(this.analyserNode);
-      this.analyserNode.connect(this.waveShaperNode);
-      this.waveShaperNode.connect(this.biquadFilterNode);
-      this.biquadFilterNode.connect(this.convolverNode);
-      this.convolverNode.connect(this.gainNode);
-      this.gainNode.connect(this.audioContext.destination);
-      */
 
       this.analyserNodes_WeakMap.set(this.audio, this.analyserNode);
       this.mediaElementAudioSourceNodes_WeakMap.set(this.audio, this.mediaElementAudioSourceNode);
@@ -333,12 +303,6 @@ export class PlayerService {
 
   public defaultEqualizer() {
     console.log('defaultEqualizer');
-    /*
-    this.biquadFilterNode.type = filterTypeSelected;
-    this.biquadFilterNode.frequency.value = this.biquadFilterNode.frequency.defaultValue;
-    this.biquadFilterNode.Q.value = this.biquadFilterNode.Q.defaultValue;
-    this.biquadFilterNode.gain.value = this.biquadFilterNode.gain.defaultValue;
-    */
 
     this.highShelfNode.type = 'highshelf';
     this.highShelfNode.frequency.value = 4700;
@@ -383,6 +347,24 @@ export class PlayerService {
         this.lowPassNode.Q.value = data.qValue; // 0.7;
         break;
     }
+  }
+
+  public connect() {
+    console.log('connect 1');
+    this.analyserNode.connect(this.highShelfNode);
+    this.highShelfNode.connect(this.lowShelfNode);
+    this.lowShelfNode.connect(this.highPassNode);
+    this.highPassNode.connect(this.lowPassNode);
+    this.lowPassNode.connect(this.audioContext.destination);
+  }
+
+  public disconnect() {
+    console.log('disconnect 1');
+    this.highShelfNode.disconnect();
+    this.lowShelfNode.disconnect();
+    this.highPassNode.disconnect();
+    this.lowPassNode.disconnect();
+    this.analyserNode.connect(this.audioContext.destination);
   }
 
   private setPlayerStatus(key) {

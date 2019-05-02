@@ -1,26 +1,17 @@
+<mat-card class="equalizer-controllers">
+  <button mat-button (click)="debug()">Debug</button>
+  <button mat-button (click)="connect()">Conectar el ecualizador</button>
+  <button mat-button (click)="default()">Ecualizador por defecto</button>
+  <button mat-button (click)="send()">Actualizar</button>
+  <button mat-button (click)="disconnect()">Desconectar el ecualizador</button>
+</mat-card>
 <mat-card class="equalizer">
 
-  <button mat-button (click)="update()">Update</button>
-  <button mat-button (click)="default()">Default</button>
-  <button mat-button (click)="send()">Send</button>
-
-
   <div class="section">
-    <div class="title-select">
-      <h3>Selecciona el filtro del equalizador</h3>
-      <mat-form-field>
-        <mat-label>Selecciona el filtro del equalizador</mat-label>
-        <mat-select [(value)]="filterTypeSelected">
-          <mat-option *ngFor="let filter of filterType" [value]="filter.value">
-            {{filter.viewValue}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <p>{{filterTypeSelected}}</p>
-    </div>
 
     <div class="sliders" *ngFor="let slider of filterType">
 
+      <h2>{{slider.viewValue}}</h2>
 
       <div class="range-slider">
         <span class="scope scope-min">{{slider.frequency.minValue}}</span>

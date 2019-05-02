@@ -25,7 +25,7 @@ export class FileService {
 
 
   constructor(private _electronService: ElectronService) {
-    this.isElectronApp = this._electronService.isElectron();
+    this.isElectronApp = ElectronService.isElectron();
 
     if (this.isElectronApp === 'renderer') {
       this.fs = this._electronService.remote.require('fs');

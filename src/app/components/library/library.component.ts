@@ -16,7 +16,7 @@ export class LibraryComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
   public dataSource: MatTableDataSource<Song> = new MatTableDataSource([]);
-  public displayedColumns: string[] = ['title', 'album', 'artist'];
+  public displayedColumns: string[] = ['play', 'title', 'album', 'artist'];
   private songListSubscription: Subscription;
 
   titleFilter = new FormControl('');
@@ -64,5 +64,10 @@ export class LibraryComponent implements OnInit {
         && data.album.toString().toLowerCase().indexOf(searchTerms.album) !== -1
         && data.artist.toLowerCase().indexOf(searchTerms.artist) !== -1;
     };
+  }
+
+  play_music(song: Song) {
+    this._playerService.setPlayer(song);
+    this._playerService.playerTogglePlayPause();
   }
 }

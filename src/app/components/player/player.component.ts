@@ -154,4 +154,9 @@ export class PlayerComponent implements OnInit, OnDestroy {
     this.volume = 0;
     this.setVolume(this.volume);
   }
+
+  max() {
+    this.volume = 1;
+    this.setVolume(this.volume);
+  }
 }

@@ -92,10 +92,11 @@
   }
 
   .volume {
-    grid-column-start: 3;
     display: grid;
-    align-items: start;
-    grid-template-rows: 1fr 1fr;
+    grid-column-start: 3;
+    grid-template-columns: 1fr 2fr 1fr;
     justify-content: center;
+    align-content: center;
+    align-items: center;
   }
 }
