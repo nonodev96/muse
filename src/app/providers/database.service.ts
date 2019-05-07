@@ -115,7 +115,9 @@ export class DatabaseService {
     return new Promise((resolve) => {
       storage.get(EnumDataBase.favorites, this.dataBaseJsonPath, (error_GET, dataJSON_Favorites: InterfaceFavorites) => {
         resolve(dataJSON_Favorites);
-        console.log(error_GET);
+        if (error_GET !== undefined) {
+          console.log(error_GET);
+        }
       });
     });
   }

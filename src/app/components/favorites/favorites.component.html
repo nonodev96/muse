@@ -1,3 +1,41 @@
-<mat-card>
+<div id="favorites-container">
 
-</mat-card>
+  <div *ngFor="let favorite of favorites; let i = index">
+
+    <mat-card class="favorite-card">
+      <mat-card-header>
+        <div class="favorite-card-image" mat-card-avatar [style.background-image]="'url('+ favorite.imgData + ')'"></div>
+        <mat-card-title>{{favorite.title}}</mat-card-title>
+        <mat-card-subtitle>{{favorite.artist}} - {{favorite.album}}</mat-card-subtitle>
+      </mat-card-header>
+      <img mat-card-image src="{{favorite.imgData}}" alt="{{favorite.title}}">
+      <mat-card-content>
+        <div class="metadata-song" *ngIf="favorite">
+          <div class="title-artist-album" *ngIf="favorite.audioMetadata">
+
+            <div class="genres">
+              <p *ngIf="favorite.audioMetadata.common">
+                Generos: <span *ngFor="let gen of favorite.audioMetadata.common.genre">{{gen}}</span>
+              </p>
+            </div>
+            <div class="isrc">
+              <p *ngIf="favorite.audioMetadata.common">
+                ISRC: <span *ngFor="let id of favorite.audioMetadata.common.isrc">{{id}}</span>
+              </p>
+            </div>
+            <div class="path">
+              <p>Path: {{favorite.src}}</p>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-button (click)="playSong(favorite)">Play</button>
+      </mat-card-actions>
+    </mat-card>
+
+  </div>
+
+
+
+</div>

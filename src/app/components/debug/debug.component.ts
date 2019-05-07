@@ -81,7 +81,9 @@ export class DebugComponent implements OnInit, OnDestroy {
   }
 
   getAllFavorites() {
-    this._databaseService.getAllFavorites();
+    this._databaseService.getAllFavorites().then(value => {
+      console.log(value);
+    });
   }
 
   database() {

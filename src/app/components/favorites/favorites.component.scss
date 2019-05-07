@@ -1,0 +1,17 @@
+#favorites-container {
+  padding: 1em;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  column-gap: 1em;
+  row-gap: 1em;
+
+  .favorite-card {
+    max-width: 400px;
+  }
+
+  .favorite-card-image {
+    // background-image: attr(data-image-src url);
+    // background-image: url('https://material.angular.io/assets/img/examples/shiba1.jpg');
+    background-size: cover;
+  }
+}
