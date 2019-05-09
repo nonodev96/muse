@@ -86,6 +86,12 @@ export class DebugComponent implements OnInit, OnDestroy {
     });
   }
 
+  getAllPlayLists() {
+    this._databaseService.getAllPlayLists().then((value) => {
+      console.log(value);
+    });
+  }
+
   database() {
     this._databaseService.database();
   }

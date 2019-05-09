@@ -1,3 +1,26 @@
-<p>
-  playlists works!
-</p>
+<div class="play_lists_container">
+
+  <div class="c1">
+    <mat-nav-list>
+
+      <h3 matSubheader>Lists: </h3>
+      <div *ngFor="let playList_ of playLists.playLists">
+
+        <a mat-list-item (click)="onSelect(playList_)">
+          <span matLine>{{playList_.name}}</span>
+          <button mat-icon-button (click)="play(playList_)">
+            <mat-icon>play_arrow</mat-icon>
+          </button>
+        </a>
+
+      </div>
+    </mat-nav-list>
+  </div>
+
+  <div class="c2">
+
+    <app-playlists-detail [playList]="selected_play_list"></app-playlists-detail>
+
+  </div>
+
+</div>

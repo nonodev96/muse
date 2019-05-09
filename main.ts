@@ -257,7 +257,9 @@ function createWindow() {
     }));
   }
 
-  win.webContents.openDevTools();
+  if (serve) {
+    win.webContents.openDevTools();
+  }
 
   // Emitted when the window is closed.
   win.on('closed', () => {

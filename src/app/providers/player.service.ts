@@ -209,10 +209,10 @@ export class PlayerService {
     this.setSong(song);
     console.log(ElectronService.isServer(), ElectronService.isElectron());
     if (ElectronService.isServer()) {
+      this.audio.src = './assets/02. Copacabana.mp3';
     } else {
-      // this.audio.src = './assets/02. Copacabana.mp3';
+      this.audio.src = 'file:///' + song.src;
     }
-    this.audio.src = 'file:///' + song.src;
 
     if (this.analyserNodes_WeakMap.has(this.audio)) {
       this.mediaElementAudioSourceNode = this.mediaElementAudioSourceNodes_WeakMap.get(this.audio);

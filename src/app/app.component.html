@@ -21,6 +21,10 @@
         <mat-icon mat-list-icon>favorite</mat-icon>
         <p mat-line>Favorites</p>
       </a>
+      <a mat-list-item (click)="closeSidenav()" routerLink="/playLists">
+        <mat-icon mat-list-icon>playlist_play</mat-icon>
+        <p mat-line>Play Lists</p>
+      </a>
       <a mat-list-item (click)="closeSidenav()" routerLink="/audio-visualizer">
         <mat-icon mat-list-icon>album</mat-icon>
         <p mat-line>Visualizer</p>

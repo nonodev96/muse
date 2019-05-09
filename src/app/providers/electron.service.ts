@@ -16,6 +16,8 @@ export class ElectronService {
   childProcess: typeof childProcess;
   fs: typeof fs;
 
+  private _electron: Electron.RendererInterface;
+
   constructor() {
     // Conditional imports
     if (ElectronService.isElectron()) {
@@ -28,12 +30,77 @@ export class ElectronService {
     }
   }
 
+  private get electron(): Electron.RendererInterface {
+    if (!this._electron) {
+      if (window && window.require) {
+        this._electron = window.require('electron');
+        return this._electron;
+      }
+      return null;
+    }
+    return this._electron;
+  }
+
   public static isElectron() {
     return window && window.process && window.process.type;
   }
 
   public static isServer(): boolean {
-    const args = process.argv.slice(1);
-    return args.some(val => val === '--serve');
+    let location_href = window.location.href;
+    let localhost = 'http://localhost:4200/';
+    return location_href.includes(localhost);
+  }
+
+  // New 2
+  public static get isElectronApp(): boolean {
+    return !!window.navigator.userAgent.match(/Electron/);
+  }
+
+  public static get isMacOS(): boolean {
+    return ElectronService.isElectronApp && process.platform === 'darwin';
+  }
+
+  public static get isWindows(): boolean {
+    return ElectronService.isElectronApp && process.platform === 'win32';
+  }
+
+  public static get isLinux(): boolean {
+    return ElectronService.isElectronApp && process.platform === 'linux';
+  }
+
+  public static get isX86(): boolean {
+    return ElectronService.isElectronApp && process.arch === 'ia32';
+  }
+
+  public static get isX64(): boolean {
+    return ElectronService.isElectronApp && process.arch === 'x64';
+  }
+
+  public get desktopCapturer(): Electron.DesktopCapturer {
+    return this.electron ? this.electron.desktopCapturer : null;
+  }
+
+  public get clipboard(): Electron.Clipboard {
+    return this.electron ? this.electron.clipboard : null;
+  }
+
+  public get crashReporter(): Electron.CrashReporter {
+    return this.electron ? this.electron.crashReporter : null;
+  }
+
+  public get process(): any {
+    return this.remote ? this.remote.process : null;
+  }
+
+  public get nativeImage(): typeof Electron.nativeImage {
+    return this.electron ? this.electron.nativeImage : null;
+  }
+
+  public get screen(): Electron.Screen {
+    return this.electron ? this.electron.screen : null;
+  }
+
+  public get shell(): Electron.Shell {
+    return this.electron ? this.electron.shell : null;
   }
 }
