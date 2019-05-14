@@ -4,23 +4,40 @@
 
 
 # MUSE
+
 # Introduction
+
 Para instalar dependencias asociadas al package.json del proyecto
-```
+
+```npm
 npm install 
 ```
 
-# Desarrollar
-```
+# Desarrollar y Compilar
+
+Con este simple comando en la terminal podemos utilizar la aplicación Angular con Electron en un entorno de desarrollo local con recarga en caliente, esté comando no es recomendable una vez que la aplicación se va a lanzar a producción.
+
+```npm
 npm run start 
 ```
-Con este simple comando en la terminal podemos utilizar la aplicación Angular con Electron en un entorno de desarrollo local con recarga en caliente, esté comando no es recomendable una vez que la aplicación se va a lanzar a producción.
+
+Compilar para MacBook Pro: 
+
+```npm
+npm run electron:mac
+```
+
+# DOCUMENTACIÓN
+
+Toda la documentación se encuentra en la wiki del repositorio.
+
+[WIKI](https://github.com/nonodev96/muse/wiki)
 
 
 # Modo navegador
 ¿Quizás quieras ejecutar la aplicación en el navegador con recarga en caliente? Puedes hacerlo con `npm run ng:serve:web`. Tenga en cuenta que en este caso no puede usar las bibliotecas nativas Electron o NodeJS. Verifique los `providers/electron.service.ts` para ver cómo se realiza la importación condicional de bibliotecas electron/native.
 
-## Included Commands
+## Commandos
 
 |Command|Description|
 |--|--|
@@ -32,12 +49,11 @@ Con este simple comando en la terminal podemos utilizar la aplicación Angular c
 |`npm run electron:windows`| On a Windows OS, builds your application and creates an app consumable in windows 32/64 bit systems |
 |`npm run electron:mac`|  On a MAC OS, builds your application and generates a `.app` file of your application that can be run on Mac |
 
-**Your application is optimised. Only /dist folder and node dependencies are included in the executable.**
-
 
 
 REFERENCIAS
 ===========
+https://github.com/maximegris/angular-electron 
 https://www.brainbell.com/javascript/show-open-dialog.html
 https://github.com/electron/electron/blob/master/docs/api/dialog.md
 
