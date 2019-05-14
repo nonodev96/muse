@@ -14,19 +14,24 @@
           transform="translate(-0.02 0.01)" class="strawberry"></path>
         <path d="M24.13,16.11a7.25,7.25,0,0,1,7.24,7.24,6,6,0,0,1-.1.95l-13.9-3.48A7.25,7.25,0,0,1,24.13,16.11Z"
               transform="translate(-0.02 0.01)" class="strawberry"></path>
-        <path d="M175.43,17.58a12.61,12.61,0,1,1-4,.68A12.59,12.59,0,0,1,175.43,17.58Z" transform="translate(-0.02 0.01)"
+        <path d="M175.43,17.58a12.61,12.61,0,1,1-4,.68A12.59,12.59,0,0,1,175.43,17.58Z"
+              transform="translate(-0.02 0.01)"
               class="strawberry"></path>
-        <path d="M471.22,17.58a12.6,12.6,0,1,1-4.05.68A12.39,12.39,0,0,1,471.22,17.58Z" transform="translate(-0.02 0.01)"
+        <path d="M471.22,17.58a12.6,12.6,0,1,1-4.05.68A12.39,12.39,0,0,1,471.22,17.58Z"
+              transform="translate(-0.02 0.01)"
               class="strawberry"></path>
-        <path d="M622.54,18.15a7.25,7.25,0,0,1,7.24,7.24,7.45,7.45,0,0,1-.09.95l-13.91-3.48A7.21,7.21,0,0,1,622.54,18.15Z"
-              transform="translate(-0.02 0.01)" class="strawberry"></path>
+        <path
+          d="M622.54,18.15a7.25,7.25,0,0,1,7.24,7.24,7.45,7.45,0,0,1-.09.95l-13.91-3.48A7.21,7.21,0,0,1,622.54,18.15Z"
+          transform="translate(-0.02 0.01)" class="strawberry"></path>
         <path d="M70.86,19.62a18,18,0,1,0,8.24,2A18,18,0,0,0,70.86,19.62Z" transform="translate(-0.02 0.01)"
               class="cassette_outline"></path>
         <circle cx="576.23" cy="37.62" r="17.99" class="cassette_outline"></circle>
-        <path d="M70.86,21.32A16.33,16.33,0,1,1,64,22.83,16.33,16.33,0,0,1,70.86,21.32Z" transform="translate(-0.02 0.01)"
+        <path d="M70.86,21.32A16.33,16.33,0,1,1,64,22.83,16.33,16.33,0,0,1,70.86,21.32Z"
+              transform="translate(-0.02 0.01)"
               class="strawberry"></path>
         <circle cx="576.23" cy="37.62" r="16.3" class="strawberry"></circle>
-        <path d="M16.9,23.5l13.5,3.39A7.2,7.2,0,0,1,16.9,23.5Z" transform="translate(-0.02 0.01)" class="strawberry"></path>
+        <path d="M16.9,23.5l13.5,3.39A7.2,7.2,0,0,1,16.9,23.5Z" transform="translate(-0.02 0.01)"
+              class="strawberry"></path>
         <path d="M615.31,25.54l13.51,3.38a7.21,7.21,0,0,1-13.51-3.38Z" transform="translate(-0.02 0.01)"
               class="strawberry"></path>
         <path
@@ -39,7 +44,8 @@
         <circle cx="576.23" cy="37.62" r="8.15" class="cassette_outline"></circle>
         <circle cx="70.84" cy="37.62" r="5.77" class="strawberry"></circle>
         <circle cx="576.23" cy="37.62" r="5.77" class="strawberry"></circle>
-        <path d="M70.86,37.27a.34.34,0,0,0-.34.34c0,.38.68.38.68,0a.34.34,0,0,0-.34-.34Z" transform="translate(-0.02 0.01)"
+        <path d="M70.86,37.27a.34.34,0,0,0-.34.34c0,.38.68.38.68,0a.34.34,0,0,0-.34-.34Z"
+              transform="translate(-0.02 0.01)"
               class="cassette_outline"></path>
         <path d="M576.25,37.27a.34.34,0,0,0-.34.34h0c0,.38.68.38.68,0A.34.34,0,0,0,576.25,37.27Z"
               transform="translate(-0.02 0.01)" class="cassette_outline"></path>
@@ -99,5 +105,74 @@
     </svg>
   </div>
 
+  <div class="metadata" *ngIf="song">
+    <h2>Metadatos: </h2>
+    <div *ngIf="song.audioMetadata">
+      <div *ngIf="song.audioMetadata.common.picture">
+        <h3>Embedded cover art</h3>
+        <div *ngFor="let picture of song.audioMetadata.common.picture">
+          <img src="data:{{ picture.format }};base64,{{picture.data.toString('base64')}}">
+          <div>
+            <table>
+              <tr>
+                <td>Format</td>
+                <td>{{ picture.format }}</td>
+              </tr>
+              <tr>
+                <td>Type</td>
+                <td>{{ picture.type }}</td>
+              </tr>
+              <tr>
+                <td>Description</td>
+                <td>{{ picture.description }}</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
 
+    <div *ngFor="let tagList of tagLists">
+      <h2>{{ tagList.title }}</h2>
+      <table class="table">
+        <tr>
+          <th class="text-right">Label</th>
+          <th>Value</th>
+          <th>Property name</th>
+        </tr>
+        <tr *ngFor="let tag of tagList.tags">
+          <td class="text-right">
+            <a *ngIf="tag.label.ref" target="_blank"
+               [href]="tag.label.ref">{{tag.label.text}}</a>
+            <span *ngIf="!tag.label.ref">{{tag.label.text}}</span>
+          </td>
+          <td>
+            <span *ngFor="let v of tag.value; let first = first;">
+              <span *ngIf="!first">, </span>
+              <a *ngIf="v.ref" target="_blank" [href]="v.ref">{{v.text}}</a>
+              <span *ngIf="!v.ref">{{v.text}}</span>
+            </span>
+          </td>
+          <td>{{tag.key}}</td>
+        </tr>
+      </table>
+    </div>
+
+    <h2>Native tags</h2>
+    <div *ngFor="let type of nativeTags">
+      <h3>{{ type.type }}</h3>
+
+      <table class="table">
+        <tr>
+          <th class="text-right">Key</th>
+          <th>Value</th>
+        </tr>
+        <tr *ngFor="let tag of type.tags">
+          <td class="text-right">{{tag.id }}</td>
+          <td>{{ tag.value }}</td>
+        </tr>
+      </table>
+
+    </div>
+  </div>
 </div>

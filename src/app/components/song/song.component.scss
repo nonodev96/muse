@@ -1,15 +1,20 @@
 .container {
+  display: grid;
+  justify-items: center;
+  grid-template-columns: 1fr 3fr;
+  row-gap: 1em;
+  column-gap: 1em;
+  font-family: sans-serif;
+
   .cassette_container {
-    display: grid;
-    justify-items: center;
-    grid-template-columns: 1fr 2fr 1fr;
+    grid-row-start: 1;
+    grid-column-start: 1;
+
     #cassette {
-      grid-column-start: 2;
-      //-webkit-transform: scaleY(-1);
-      //transform: scaleY(-1);
+      margin-top: 4em;
       cursor: default;
       height: auto;
-      width: 60%;
+      width: 100%;
 
       .wheel.right {
         transform-origin: 457.21px 217.385px;
@@ -27,5 +32,11 @@
         fill: #0a0b09
       }
     }
+  }
+
+  .metadata {
+    grid-row-start: 1;
+    grid-column-start: 2;
+    width: 100%;
   }
 }
