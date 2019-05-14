@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {IAudioMetadata, IOptions} from 'music-metadata';
 import {ElectronService} from './electron.service';
 import * as mm from 'music-metadata/lib/core';
+import * as mmb from 'music-metadata-browser';
 import * as fs from 'fs';
 
 @Injectable({
@@ -75,6 +76,21 @@ export class FileService {
       mm.parseStream(stream, null, {native: true})
         .then((metadata: IAudioMetadata) => {
           stream.close();
+
+          resolve(metadata);
+        });
+    });
+  }
+
+  public loadAudioMetaDataFromURL(url: string): Promise<string | IAudioMetadata> {
+    return new Promise((resolve) => {
+      if (this.isElectronApp !== 'renderer') {
+        resolve('loadAudioMetaDataFromURL(url: string) return ElectronApp ' + this.isElectronApp);
+        return null;
+      }
+
+      mmb.fetchFromUrl(url, {native: true})
+        .then((metadata: IAudioMetadata) => {
 
           resolve(metadata);
         });
