@@ -32,14 +32,18 @@
       display: grid;
       grid-column-start: 2;
       grid-template-rows: 30px 25px 25px;
-      padding-left: 1em;
+      margin-left: 1em;
       font-family: sans-serif;
 
       .title {
         grid-row-start: 1;
+        overflow: hidden;
 
         h4 {
           margin: 0;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
         }
       }
 
@@ -98,5 +102,24 @@
     justify-content: center;
     align-content: center;
     align-items: center;
+  }
+}
+
+.marquee:hover {
+  overflow: hidden;
+
+  p, h1, h2, h3, h4 {
+    display: inline-block;
+    animation: marquee 10s linear infinite;
+    animation-delay: 1s;
+  }
+}
+
+@keyframes marquee {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(-100%, 0);
   }
 }

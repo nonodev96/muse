@@ -61,9 +61,11 @@
         <button mat-button (click)="addSongToFavorites(song)">
           <mat-icon class="toolbar-icon" aria-hidden="false" aria-label="Add to favorite playlist">favorite</mat-icon>
         </button>
+        <!--
         <button mat-button *ngIf="isPiPAvailable" (click)="PiPSong(song)">
           <mat-icon class="toolbar-icon" aria-hidden="false" aria-label="Pucture in Picture">picture_in_picture_alt</mat-icon>
         </button>
+        -->
         <button mat-button (click)="deleteSongFromFavorites(song)">
           <mat-icon class="toolbar-icon" aria-hidden="false" aria-label="Delete from favorite playlist">delete</mat-icon>
         </button>

@@ -208,7 +208,7 @@ export class PlayerService {
   public setPlayer(song: Song) {
     this.setSong(song);
     if (ElectronService.isServer()) {
-      this.audio.src = './assets/02. Copacabana.mp3';
+      this.audio.src = './assets/Izal - 02 - Copacabana.mp3';
     } else {
       this.audio.src = 'file:///' + song.src;
     }

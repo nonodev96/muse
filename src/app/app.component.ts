@@ -26,8 +26,6 @@ export class AppComponent implements OnInit {
   public SIDENAV_HEADER_TITLE: string;
   private songSubscription: Subscription;
 
-  private videoElement: HTMLVideoElement;
-  // private togglePipButton: { disabled: boolean };
   private readonly isPiPAvailable: boolean;
 
   constructor(public electronService: ElectronService,
@@ -60,17 +58,6 @@ export class AppComponent implements OnInit {
     this.songSubscription = this._playerService.getSongObservable().subscribe(song => {
       this.song = song;
       this.TOOLBAR_TITLE = this.song.title;
-    });
-
-
-    this.videoElement.addEventListener('enterpictureinpicture', (event: any) => {
-      console.log('Entered PiP');
-      let pipWindow = event.pictureInPictureWindow;
-      console.log(`Window size -  \n Width: ${pipWindow.width} \n Height: ${pipWindow.height}`);
-    });
-    this.videoElement.addEventListener('leavepictureinpicture', (event) => {
-      console.log('Left PiP');
-      // this.togglePipButton.disabled = false;
     });
   }
 
@@ -126,11 +113,5 @@ export class AppComponent implements OnInit {
     this.snackBar.open(message, action, {
       duration: 3000
     });
-  }
-
-  PiPSong(song: Song) {
-    if (this.isPiPAvailable) {
-      this.videoElement = document.getElementsByTagName('video')[ 0 ];
-    }
   }
 }

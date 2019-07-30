@@ -14,11 +14,7 @@ let serve = args.some(val => val === '--serve');
 function createWindow() {
 
   const size = screen.getPrimaryDisplay().workAreaSize;
-  // if ('pictureInPictureEnabled' in document) {
-  //   console.log('pictureInPictureEnabled');
-  // } else {
-  //   console.log('! pictureInPictureEnabled');
-  // }
+
   // Create the browser window.
   win = new BrowserWindow({
     x: 0,
@@ -26,7 +22,7 @@ function createWindow() {
     width: size.width,
     height: size.height,
     webPreferences: {
-      nodeIntegration: true,
+      nodeIntegration: true
     },
     icon: path.join(__dirname, 'src/assets/icons/512x512.png')
   });
@@ -123,11 +119,12 @@ function createWindow() {
         {
           label: 'Learn More',
           click() {
-            require('electron').shell.openExternal('http://electron.atom.io');
+            require('electron').shell.openExternal('http://electron.atom.io').then(r => {
+            });
           }
         },
         {
-          label: 'Toogle Dev Tools',
+          label: 'Toggle Dev Tools',
           click() {
             win.webContents.toggleDevTools();
           }
