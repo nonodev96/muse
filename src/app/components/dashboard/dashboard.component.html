@@ -5,6 +5,8 @@
   </div>
 
   <div *ngIf="songListInFolder" class="dashboard">
+    <video src="https://cdn.arnellebalane.com/videos/original-video.mp4" controls></video>
+    <br>
     <mat-accordion class="dashboard-headers-align">
 
       <mat-expansion-panel *ngFor="let song of songListInFolder; let i = index"

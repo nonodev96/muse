@@ -1,9 +1,8 @@
-import {app, dialog, BrowserWindow, screen, Menu} from 'electron';
-import {TouchBar, NativeImage, nativeImage, TouchBarConstructorOptions} from 'electron';
+import { app, BrowserWindow, dialog, Menu, nativeImage, screen, TouchBar, TouchBarConstructorOptions } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
 
-const {TouchBarLabel, TouchBarButton, TouchBarSpacer} = TouchBar;
+const { TouchBarLabel, TouchBarButton, TouchBarSpacer } = TouchBar;
 
 
 const fs = require('fs');
@@ -14,15 +13,21 @@ let serve = args.some(val => val === '--serve');
 
 function createWindow() {
 
-  const electronScreen = screen;
-  const size = electronScreen.getPrimaryDisplay().workAreaSize;
-
+  const size = screen.getPrimaryDisplay().workAreaSize;
+  // if ('pictureInPictureEnabled' in document) {
+  //   console.log('pictureInPictureEnabled');
+  // } else {
+  //   console.log('! pictureInPictureEnabled');
+  // }
   // Create the browser window.
   win = new BrowserWindow({
     x: 0,
     y: 0,
     width: size.width,
     height: size.height,
+    webPreferences: {
+      nodeIntegration: true,
+    },
     icon: path.join(__dirname, 'src/assets/icons/512x512.png')
   });
 
@@ -141,7 +146,7 @@ function createWindow() {
         }, {
           type: 'separator'
         }, {
-          role: 'services',
+          role: 'services'
         }, {
           type: 'separator'
         }, {
@@ -159,7 +164,7 @@ function createWindow() {
     });
 
     // Edit menu.
-    template[1].submenu.push(
+    template[ 1 ].submenu.push(
       {
         type: 'separator'
       }, {
@@ -175,7 +180,7 @@ function createWindow() {
     );
 
     // Window menu.
-    template[3].submenu = [
+    template[ 3 ].submenu = [
       {
         label: 'Close',
         accelerator: 'CmdOrCtrl+W',
@@ -204,30 +209,30 @@ function createWindow() {
       filters: [
         {
           name: 'Music',
-          extensions: ['mp3', 'm4a', 'webm', 'wav', 'aac', 'ogg', 'opus']
+          extensions: [ 'mp3', 'm4a', 'webm', 'wav', 'aac', 'ogg', 'opus' ]
         }
       ],
-      properties: ['openFile', 'multiSelections']
+      properties: [ 'openFile', 'multiSelections' ]
     }, function (musicFiles) {
       if (musicFiles) {
-        win.webContents.send('selected-files', {musicFiles});
+        win.webContents.send('selected-files', { musicFiles });
       }
     });
   }
 
   function scanDir(filePath) {
-    if (!filePath || filePath[0] === 'undefined') {
+    if (!filePath || filePath[ 0 ] === 'undefined') {
       return;
     }
 
-    fs.readdir(filePath[0], function (err, files) {
+    fs.readdir(filePath[ 0 ], function (err, files) {
       let arr = [];
       for (let i = 0; i < files.length; i++) {
-        if (files[i].substr(-4) === '.mp3' || files[i].substr(-4) === '.m4a'
-          || files[i].substr(-5) === '.webm' || files[i].substr(-4) === '.wav'
-          || files[i].substr(-4) === '.aac' || files[i].substr(-4) === '.ogg'
-          || files[i].substr(-5) === '.opus') {
-          arr.push(files[i]);
+        if (files[ i ].substr(-4) === '.mp3' || files[ i ].substr(-4) === '.m4a'
+          || files[ i ].substr(-5) === '.webm' || files[ i ].substr(-4) === '.wav'
+          || files[ i ].substr(-4) === '.aac' || files[ i ].substr(-4) === '.ogg'
+          || files[ i ].substr(-5) === '.opus') {
+          arr.push(files[ i ]);
         }
       }
       // console.log(filePath);
@@ -280,9 +285,9 @@ try {
     createWindow();
     if (process.platform === 'darwin') {
 
-      const iconPlayPause = nativeImage.createFromNamedImage('NSTouchBarPlayPauseTemplate', [-1, 0, 1]);
-      const iconNext = nativeImage.createFromNamedImage('NSTouchBarSkipToEndTemplate', [-1, 0, 1]);
-      const iconPrevious = nativeImage.createFromNamedImage('NSTouchBarSkipToStartTemplate', [-1, 0, 1]);
+      const iconPlayPause = nativeImage.createFromNamedImage('NSTouchBarPlayPauseTemplate', [ -1, 0, 1 ]);
+      const iconNext = nativeImage.createFromNamedImage('NSTouchBarSkipToEndTemplate', [ -1, 0, 1 ]);
+      const iconPrevious = nativeImage.createFromNamedImage('NSTouchBarSkipToStartTemplate', [ -1, 0, 1 ]);
 
       let next = new TouchBarButton({
         icon: iconNext,
@@ -290,7 +295,7 @@ try {
           win.webContents.send('media-controls', {
             status: 'next'
           });
-        },
+        }
       });
 
       let previous = new TouchBarButton({
@@ -299,7 +304,7 @@ try {
           win.webContents.send('media-controls', {
             status: 'previous'
           });
-        },
+        }
       });
 
       let playPause = new TouchBarButton({
@@ -308,7 +313,7 @@ try {
           win.webContents.send('media-controls', {
             status: 'playPause'
           });
-        },
+        }
       });
 
       let info = new TouchBarLabel({
@@ -317,7 +322,7 @@ try {
       });
 
       let options: TouchBarConstructorOptions = {
-        items: [previous, playPause, next, info]
+        items: [ previous, playPause, next, info ]
       };
 
       let touchBar = new TouchBar(options);

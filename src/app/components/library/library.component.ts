@@ -1,23 +1,23 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {MatPaginator, MatSnackBar, MatSort, MatTableDataSource} from '@angular/material';
-import {PlayerService} from '../../providers/player.service';
-import {Song} from '../../mocks/Song';
-import {Subscription} from 'rxjs';
-import {FormControl} from '@angular/forms';
-import {type} from 'os';
-import {DatabaseService, InterfacePlayList, InterfacePlayLists} from '../../providers/database.service';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatPaginator, MatSnackBar, MatSort, MatTableDataSource } from '@angular/material';
+import { PlayerService } from '../../providers/player.service';
+import { Song } from '../../mocks/Song';
+import { Subscription } from 'rxjs';
+import { FormControl } from '@angular/forms';
+import { type } from 'os';
+import { DatabaseService, InterfacePlayList, InterfacePlayLists } from '../../providers/database.service';
 
 @Component({
   selector: 'app-library',
   templateUrl: './library.component.html',
-  styleUrls: ['./library.component.scss']
+  styleUrls: [ './library.component.scss' ]
 })
 export class LibraryComponent implements OnInit {
-  @ViewChild(MatSort) sort: MatSort;
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatSort, { static: false }) public sort: MatSort;
+  @ViewChild(MatPaginator, { static: false }) public paginator: MatPaginator;
 
   public dataSource: MatTableDataSource<Song> = new MatTableDataSource([]);
-  public displayedColumns: string[] = ['play', 'title', 'album', 'artist', 'config'];
+  public displayedColumns: string[] = [ 'play', 'title', 'album', 'artist', 'config' ];
   private songListSubscription: Subscription;
   public allPlayLists: InterfacePlayLists;
 

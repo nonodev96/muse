@@ -56,6 +56,11 @@ export class ElectronService {
     return !!window.navigator.userAgent.match(/Electron/);
   }
 
+  public static get isPiPAvailable(): boolean {
+    // @ts-ignore
+    return !!window.document.pictureInPictureEnabled;
+  }
+
   public static get isMacOS(): boolean {
     return ElectronService.isElectronApp && process.platform === 'darwin';
   }

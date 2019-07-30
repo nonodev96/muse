@@ -10,7 +10,7 @@ import { Subscription } from 'rxjs';
 export class AudioVisualizerComponent implements OnInit, OnDestroy, AfterViewInit {
   private ANALYSER_NODES: WeakMap<HTMLAudioElement, AnalyserNode> = new WeakMap();
 
-  @ViewChild('canvasAudioVisualizerID') canvasAudioVisualizerID: ElementRef;
+  @ViewChild('canvasAudioVisualizerID', { static: false }) public canvasAudioVisualizerID: ElementRef;
   private canvasContext: CanvasRenderingContext2D;
   private audio: HTMLAudioElement;
   private readonly audioContext: AudioContext;

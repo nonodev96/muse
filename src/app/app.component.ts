@@ -1,10 +1,10 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {ElectronService} from './providers/electron.service';
-import {TranslateService} from '@ngx-translate/core';
-import {Subscription} from 'rxjs';
-import {PlayerService} from './providers/player.service';
-import {Song} from './mocks/Song';
-import {MatSidenav, MatSnackBar} from '@angular/material';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { ElectronService } from './providers/electron.service';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
+import { PlayerService } from './providers/player.service';
+import { Song } from './mocks/Song';
+import { MatSidenav, MatSnackBar } from '@angular/material';
 import {
   DatabaseService,
   EnumAddFavorites,
@@ -16,15 +16,19 @@ import {
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: [ './app.component.scss' ]
 })
 export class AppComponent implements OnInit {
-  @ViewChild('elementSidenavID') matSidenavRef: MatSidenav;
+  @ViewChild('sidenavID', { static: false }) public matSidenavRef!: MatSidenav;
 
   public song: Song;
   public TOOLBAR_TITLE: string;
   public SIDENAV_HEADER_TITLE: string;
   private songSubscription: Subscription;
+
+  private videoElement: HTMLVideoElement;
+  // private togglePipButton: { disabled: boolean };
+  private readonly isPiPAvailable: boolean;
 
   constructor(public electronService: ElectronService,
               private translate: TranslateService,
@@ -33,9 +37,12 @@ export class AppComponent implements OnInit {
               private snackBar: MatSnackBar) {
     // console.log('AppConfig', AppConfig);
     this.translate.setDefaultLang('es');
+    this.isPiPAvailable = ElectronService.isPiPAvailable;
+    console.log('avaliable PiP', this.isPiPAvailable);
 
     if (ElectronService.isServer()) {
     } else {
+      // console.log(process.env);
       // console.log('Mode electron');
       // console.log('Electron ipcRenderer', electronService.ipcRenderer);
       // console.log('NodeJS childProcess', electronService.childProcess);
@@ -53,6 +60,17 @@ export class AppComponent implements OnInit {
     this.songSubscription = this._playerService.getSongObservable().subscribe(song => {
       this.song = song;
       this.TOOLBAR_TITLE = this.song.title;
+    });
+
+
+    this.videoElement.addEventListener('enterpictureinpicture', (event: any) => {
+      console.log('Entered PiP');
+      let pipWindow = event.pictureInPictureWindow;
+      console.log(`Window size -  \n Width: ${pipWindow.width} \n Height: ${pipWindow.height}`);
+    });
+    this.videoElement.addEventListener('leavepictureinpicture', (event) => {
+      console.log('Left PiP');
+      // this.togglePipButton.disabled = false;
     });
   }
 
@@ -108,5 +126,11 @@ export class AppComponent implements OnInit {
     this.snackBar.open(message, action, {
       duration: 3000
     });
+  }
+
+  PiPSong(song: Song) {
+    if (this.isPiPAvailable) {
+      this.videoElement = document.getElementsByTagName('video')[ 0 ];
+    }
   }
 }
